@@ -4,7 +4,9 @@ export const calculateFuelRequired = (mass: number): number => {
   return Math.floor(mass / 3) - 2;
 };
 
-export default (filename: string): void => {
+export default calculateFuelRequired;
+
+export const solvePuzzle = (filename: string): void => {
   const input = getLinesAsNumber(filename);
   const fuelRequired = input
     .map(m => calculateFuelRequired(m))

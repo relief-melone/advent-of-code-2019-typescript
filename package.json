@@ -1,5 +1,5 @@
 {
-  "name": "advent-of-code-2018",
+  "name": "advent-of-code-2019",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,8 +8,8 @@
     "test": "./node_modules/.bin/mocha ./dist/test --recursive",
     "tsc": "./node_modules/.bin/tsc"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Relief.Melone",
+  "license": "MIT",
   "dependencies": {
     "@types/node": "^10.12.2",
     "module-alias": "^2.2.2",
