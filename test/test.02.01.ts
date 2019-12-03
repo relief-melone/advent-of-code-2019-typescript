@@ -2,7 +2,7 @@ import { solveInput } from "../src/02.01/execOpCode";
 import { expect } from "chai";
 
 const test = (input, result) => {
-  it.only(`will return the correct output for ${input}`, () => {
+  it(`will return the correct output for ${input}`, () => {
     expect(solveInput(input)).to.equal(result);
   });
 };
