@@ -6,7 +6,7 @@
       "request": "launch",
       "name": "2019",
       "program": "${workspaceFolder}\\dist\\src\\index.js",
-      "args": ["03.01"],
+      "args": ["03.02"],
       "outFiles": ["${workspaceFolder}/**/*.js"],
       "console": "integratedTerminal"
     },
@@ -19,10 +19,10 @@
         "--timeout",
         "999999",
         "--colors",
-        "${workspaceFolder}/dist/test"
+        "${workspaceFolder}/dist/test",
       ],
       "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen"
+      "internalConsoleOptions": "neverOpen",
     }
   ]
 }

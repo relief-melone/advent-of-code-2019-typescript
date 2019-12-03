@@ -1,12 +1,14 @@
 import {
   solveInput,
-  placeWire,
-  findCrossings,
-  getClosestDistance
+  getClosestDistance,
+  getPositionsListFromInstruction,
+  ListObject,
+  Crossing,
+  findCrossingsBetweenTwoWires
 } from "../src/03.01/exec";
 import { expect } from "chai";
 
-const testSolveInput = (input: Array<Array<string>>, output: number) => {
+const testSolveInput = (input: [string[], string[]], output: number) => {
   it(`Will correctly calculate a distance of ${output} for ${JSON.stringify(
     input
   ).slice(0, 10)}...`, () => {
@@ -14,32 +16,31 @@ const testSolveInput = (input: Array<Array<string>>, output: number) => {
   });
 };
 
-const testPlaceWire = (
-  from,
-  instruction,
-  grid,
-  wireNumber,
-  expectedEndPosition,
-  expectedGrid
+const testGetPositionsListFromInstructions = (
+  instruction: string,
+  currentPositionList:any,
+  expectedResult: any
 ) => {
-  it.only(`Will correctly place wire for instruction ${instruction}`, () => {
-    const endPosition = placeWire(from, instruction, grid, wireNumber);
-    expect(endPosition).to.deep.equal(expectedEndPosition);
-    expect(grid).to.deep.equal(expectedGrid);
-  });
-};
+  it(`Will return the correct list for instruction ${instruction}`, () => {
+    const list = getPositionsListFromInstruction(instruction, currentPositionList);
+    expect(list).to.deep.equal(expectedResult)
+  })
+}
 
-const testFindCrossing = (
-  inputGrid: Array<Array<number>>,
-  expectedCrossings: Array<[number, number]>
+const testFindCrossingsBetweenTwoWires = (
+  positionList1: ListObject[],
+  positionList2: ListObject[],
+  expectedCrossings: Crossing[]
 ) => {
-  it(`will determine the correct ${expectedCrossings.length} crossings`, () => {
-    expect(findCrossings(inputGrid)).to.have.deep.members(expectedCrossings);
+  it(`will determine the correct crossings for 2 position lists as ${JSON.stringify(expectedCrossings)}`, () => {
+    const crossings = findCrossingsBetweenTwoWires([positionList1, positionList2]);
+    expect(crossings).to.deep.equal(expectedCrossings);
   });
-};
+}
+
 
 const testGetClosestDistance = (
-  crossings: Array<[number, number]>,
+  crossings: Crossing[],
   expectedDistance: number
 ) => {
   it(`will calculate the correct distance of ${expectedDistance}`, () => {
@@ -48,112 +49,111 @@ const testGetClosestDistance = (
 };
 
 describe("Day 03 - First Puzzle", () => {
-  testPlaceWire([0, 0], "R4", {}, 1, [4, 0], {
-    "1,0": [1],
-    "2,0": [1],
-    "3,0": [1],
-    "4,0": [1]
-  });
 
-  testPlaceWire(
-    [4, 0],
-    "U4",
-    {
-      "1,0": [1],
-      "2,0": [1],
-      "3,0": [1],
-      "4,0": [1]
-    },
-    1,
-    [4, 4],
-    {
-      "1,0": [1],
-      "2,0": [1],
-      "3,0": [1],
-      "4,0": [1],
-      "4,1": [1],
-      "4,2": [1],
-      "4,3": [1],
-      "4,4": [1]
-    }
-  );
-  // testPlaceWire(
-  //   [2, 3],
-  //   "D3",
-  //   [
-  //     [0, 0, 0, 0, 0],
-  //     [1, 0, 0, 0, 0],
-  //     [1, 0, 0, 1, 0],
-  //     [1, 0, 0, 1, 0],
-  //     [1, 1, 1, 1, 0]
-  //   ],
-  //   [2, 0],
-  //   [
-  //     [0, 0, 0, 0, 0],
-  //     [1, 0, 0, 0, 0],
-  //     [2, 1, 1, 1, 0],
-  //     [1, 0, 0, 1, 0],
-  //     [1, 1, 1, 1, 0]
-  //   ]
-  // );
+  
+  testGetPositionsListFromInstructions("R4",[],[
+    {position: "1,0"},
+    {position: "2,0"},
+    {position: "3,0"},
+    {position: "4,0"}, 
+  ]);
 
-  testFindCrossing(
-    [
-      [0, 1, 1, 1, 1],
-      [0, 0, 0, 1, 1],
-      [0, 2, 1, 1, 1],
-      [0, 1, 0, 0, 1],
-      [0, 1, 1, 1, 1]
-    ],
-    [[2, 1]]
-  );
-  testFindCrossing(
-    [
-      [0, 2, 1, 1, 1],
-      [0, 1, 0, 1, 1],
-      [0, 2, 1, 1, 1],
-      [0, 1, 0, 0, 1],
-      [0, 1, 1, 1, 1]
-    ],
-    [
-      [2, 1],
-      [0, 1]
-    ]
-  );
+  testGetPositionsListFromInstructions("U4",[
+    {position: "1,0"},
+    {position: "2,0"},
+    {position: "3,0"},
+    {position: "4,0"}, 
+  ],[
+    {position: "1,0"},
+    {position: "2,0"},
+    {position: "3,0"},
+    {position: "4,0"}, 
+    {position: "4,1"},
+    {position: "4,2"},
+    {position: "4,3"},
+    {position: "4,4"},
+  ]);
 
-  testGetClosestDistance(
-    [
-      [10, 2],
-      [16, 2],
-      [5, 5]
-    ],
-    10
-  );
+  testGetPositionsListFromInstructions("L6",[
+    {position: "1,0"},
+    {position: "2,0"},
+    {position: "3,0"},
+    {position: "4,0"}, 
+    {position: "4,1"},
+    {position: "4,2"},
+    {position: "4,3"},
+    {position: "4,4"},
+  ],[
+    {position: "1,0"},
+    {position: "2,0"},
+    {position: "3,0"},
+    {position: "4,0"}, 
+    {position: "4,1"},
+    {position: "4,2"},
+    {position: "4,3"},
+    {position: "4,4"},
+    {position: "3,4"},
+    {position: "2,4"},
+    {position: "1,4"},
+    {position: "0,4"},
+    {position: "-1,4"},
+    {position: "-2,4"},
+  ]);
 
-  testSolveInput(
-    [
-      ["R10", "U10", "L10", "D2"],
-      ["U2", "R10"]
-    ],
-    12
-  );
+  testFindCrossingsBetweenTwoWires([
+    {position: "1,0"},
+    {position: "2,0"},
+    {position: "3,0"},
+    {position: "4,0"}, 
+    {position: "4,1"},
+    {position: "4,2"},
+    {position: "4,3"},
+    {position: "4,4"},
+  ],[
+    {position: "0,1"},
+    {position: "0,2"},
+    {position: "1,2"},
+    {position: "2,2"}, 
+    {position: "3,2"},
+    {position: "4,2"},
+    {position: "5,2"},
+    {position: "6,2"}
+  ],[
+    {position: "4,2"}
+  ]);
 
-  testSolveInput(
-    [
-      ["R10", "U10", "L10", "D2"],
-      ["U2", "R12", "U2", "L10", "D3"]
-    ],
-    4
-  );
+  testFindCrossingsBetweenTwoWires([
+    {position: "1,0"},
+    {position: "2,0"},
+    {position: "3,0"},
+    {position: "4,0"}, 
+    {position: "4,1"},
+    {position: "4,2"},
+    {position: "4,3"},
+    {position: "4,4"},
+  ],[
+    {position: "0,1"},
+    {position: "0,2"},
+    {position: "1,2"},
+    {position: "2,2"}, 
+    {position: "3,2"},
+    {position: "4,2"},
+    {position: "5,2"},
+    {position: "6,3"},
+    {position: "5,3"},
+    {position: "4,3"},
+    {position: "3,3"},
+  ],[
+    {position: "4,2"},
+    {position: "4,3"}
+  ]);
 
-  testSolveInput(
-    [
-      ["R10", "U10", "L10", "D2", "L2", "D10"],
-      ["U2", "R12", "U2", "L13", "D5", "L3"]
-    ],
-    3
-  );
-
+ 
+  testGetClosestDistance([
+    {position: "4,2"},
+    {position: "4,3"}
+  ], 6);
+   
   testSolveInput(
     [
       ["R75", "D30", "R83", "U83", "L12", "D49", "R71", "U7", "L72"],

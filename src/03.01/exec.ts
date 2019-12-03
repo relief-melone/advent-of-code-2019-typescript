@@ -1,98 +1,74 @@
-export const placeWire = (
-  from: [number, number],
+export interface ListObject {
+  position: string;
+}
+
+export interface Crossing {
+  position: string
+  runningSum?: number
+}
+
+export const getPositionsListFromInstruction = (
   instruction: string,
-  grid: Record<string, any>,
-  wireNumber: number
-): [number, number] => {
+  currentPositonList:  Array<ListObject>
+): Array<ListObject> => {
   const direction = instruction.slice(0, 1);
   const distance = parseInt(instruction.slice(1));
 
-  const directionIndex = direction == "R" || direction === "L" ? 0 : 1;
-  const reverse = direction === "D" || direction === "L";
+  const isHorizontalMovement = direction == "R" || direction === "L" ? 0 : 1;
+  const isMovementInNegativeDirection =  direction === "D" || direction === "L";
 
-  let pos;
-  for (
-    pos = from[directionIndex];
-    reverse
-      ? pos > from[directionIndex] - distance
-      : pos < from[directionIndex] + distance;
-    reverse ? pos-- : pos++
-  ) {
-    const endPos = reverse ? pos - 1 : pos + 1;
-    if (directionIndex === 0) {
-      grid[`${endPos},${from[1]}`] = !grid[`${endPos},${from[1]}`]
-        ? [wireNumber]
-        : grid[`${endPos},${from[1]}`].push(wireNumber);
-    } else {
-      grid[`${from[0]},${endPos}`] = !grid[`${from[0]},${endPos}`]
-        ? [wireNumber]
-        : grid[`${from[0]},${endPos}`].push(wireNumber);
-    }
-  }
-  return directionIndex === 0 ? [pos, from[1]] : [from[0], pos];
-};
+  let index:number;
+  let positions:Array<{position:string}> = (currentPositonList) ? currentPositonList : [];
 
-export const cleanGrid = (grid: Array<Array<number>>): void => {
-  let maxI = grid.length - 1;
-  let maxJ = 0;
+  let from = (currentPositonList && currentPositonList.length > 0) ? currentPositonList[currentPositonList.length-1].position.split(",").map(s => parseInt(s)) : [0,0]
 
-  for (let i = 0; i < grid.length; i++) {
-    if (!grid[i]) grid[i] = [];
-    maxJ = maxJ < grid[i].length ? grid[i].length : maxJ;
+  for(
+    index = from[isHorizontalMovement];
+    isMovementInNegativeDirection
+      ? index > from[isHorizontalMovement] - distance
+      : index < from[isHorizontalMovement] + distance;
+    isMovementInNegativeDirection ? index-- : index++
+  ){
+    const insetedIndex = isMovementInNegativeDirection ? index -1 : index+1;
+    positions.push({
+      position: !isHorizontalMovement ? `${insetedIndex},${from[1]}` : `${from[0]},${insetedIndex}`
+    });
   }
 
-  for (let i = 0; i < maxI; i++) {
-    for (let j = 0; j < maxJ; j++) {
-      if (!grid[i][j]) grid[i][j] = 0;
-    }
-  }
-};
+  return positions;
+}
 
-export const findCrossings = (
-  grid: Array<Array<number>>
-): Array<[number, number]> => {
-  const foundCrossings: Array<[number, number]> = [];
-  for (let i = 0; i <= grid.length; i++) {
-    let arr = grid[i];
-    if (arr) {
-      for (let j = 0; j < arr.length; j++) {
-        if (grid[i][j] >= 2) foundCrossings.push([i, j]);
-      }
-    }
-  }
+export const findCrossingsBetweenTwoWires = (
+  positionLists: [ListObject[], ListObject[]]
+): Array<Crossing> => {    
+  const positions1 = positionLists[0].map(p => p.position);
+  const positions2 = positionLists[1].map(p => p.position);
+  const foundCrossings = positions1
+  .filter(p => positions2.includes(p))
+  .map(p => {return {position: p }});
   return foundCrossings;
 };
 
 export const getClosestDistance = (
-  foundCrossings: Array<[number, number]>
+  foundCrossings: Crossing[]
 ): number => {
-  let closestDistance;
+  let closestDistance = Infinity;
   for (let crossing of foundCrossings) {
-    const currentDistance =
-      Math.abs(crossing[0] - 300) + Math.abs(crossing[1] - 300);
-    if (!closestDistance || closestDistance > currentDistance) {
-      closestDistance = currentDistance;
-    }
+    let positions = crossing.position.split(",").map(s => parseInt(s));
+    const currentDistance = Math.abs(positions[0]) + Math.abs(positions[1]);
+    closestDistance = closestDistance > currentDistance ? currentDistance : closestDistance;
   }
   return closestDistance;
 };
-export const solveInput = (WiresInstructions: Array<Array<string>>): number => {
-  const grid = [[]];
-  let currentPosition: [number, number];
 
-  for (let i = 0; i < WiresInstructions.length; i++) {
-    const instructions = WiresInstructions[i];
-    currentPosition = [300, 300];
-
-    for (let j = 0; j < instructions.length; j++) {
-      const instruction = instructions[j];
-      currentPosition = placeWire(currentPosition, instruction, grid, i);
-    }
-    cleanGrid(grid);
-  }
-
-  const crossings = findCrossings(grid);
-  const closestDistance = getClosestDistance(crossings);
-  console.log(`Closest Distance to Port: ${closestDistance}`);
+export const solveInput = (WiresInstructions: [Array<string>,Array<string>]): number => {  
+  let wire1Positions:ListObject[] = [];
+  WiresInstructions[0].flatMap(instruction => wire1Positions = getPositionsListFromInstruction(instruction, wire1Positions));
+  
+  let wire2Positions:ListObject[] = [];
+  WiresInstructions[1].flatMap(instruction => wire2Positions = getPositionsListFromInstruction(instruction, wire2Positions));
+  
+  const crossings = findCrossingsBetweenTwoWires([wire1Positions, wire2Positions]);  
+  const closestDistance = getClosestDistance(crossings);  
   return closestDistance;
 };
