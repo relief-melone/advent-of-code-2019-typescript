@@ -1,11 +1,11 @@
-import fs = require("fs");
+import fs = require('fs');
 
-const getLines = (filename: string) => {
+const getLines = (filename: string): string[] => {
   const raw = fs.readFileSync(
     `${__dirname}/../../../data/${filename}`,
-    "utf-8"
+    'utf-8'
   );
-  const lines = raw.split("\r\n");
+  const lines = raw.split('\r\n');
 
   return lines;
 };

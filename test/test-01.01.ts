@@ -1,13 +1,13 @@
-import { calculateFuelRequired } from "../src/01.01/calculateFuelRequired";
-import { expect } from "chai";
+import { calculateFuelRequired } from '../src/01.01/calculateFuelRequired';
+import { expect } from 'chai';
 
-const test = (mass, fuel) => {
+const test = (mass, fuel): void => {
   it(`${mass} of mass will require ${fuel} fuel`, () => {
     expect(calculateFuelRequired(mass)).to.equal(fuel);
   });
 };
 
-describe("Day 01 - First Puzzle", () => {
+describe('Day 01 - First Puzzle', () => {
   test(12, 2);
   test(14, 2);
   test(1969, 654);

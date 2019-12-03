@@ -1,4 +1,4 @@
-import getLinesAsNumber from "../shared/getLinesAsNumber";
+import getLinesAsNumber from '../shared/getLinesAsNumber';
 
 export const calculateFuelRequired = (mass: number): number => {
   if (mass <= 0) return 0;

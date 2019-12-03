@@ -1,4 +1,4 @@
-import getCommaSeparatedList from "../shared/getCommaSeparatedList";
+import getCommaSeparatedList from '../shared/getCommaSeparatedList';
 
 export const addOperation = (
   OpCodeQuadruple: Array<number>,
@@ -18,7 +18,7 @@ export const multiplyOperation = (
 
 export const solveInput = (input: Array<number>): string => {
   forLoop: for (let i = 0; i < input.length - 3; i += 4) {
-    let codeQuadruple = [input[i], input[i + 1], input[i + 2], input[i + 3]];
+    const codeQuadruple = [input[i], input[i + 1], input[i + 2], input[i + 3]];
 
     switch (codeQuadruple[0]) {
       case 1:
@@ -30,14 +30,14 @@ export const solveInput = (input: Array<number>): string => {
       case 99:
         break forLoop;
       default:
-        throw "Unkown Op Code";
+        throw 'Unkown Op Code';
     }
   }
-  return input.join(",");
+  return input.join(',');
 };
 
-export const solvePuzzle = (inputfile: string) => {
-  let input = getCommaSeparatedList(inputfile)
+export const solvePuzzle = (inputfile: string): void => {
+  const input = getCommaSeparatedList(inputfile)
     .map(s => parseInt(s))
     .filter(i => i === i);
 

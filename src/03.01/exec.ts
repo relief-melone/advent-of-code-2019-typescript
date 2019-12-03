@@ -3,8 +3,8 @@ export interface ListObject {
 }
 
 export interface Crossing {
-  position: string
-  runningSum?: number
+  position: string;
+  runningSum?: number;
 }
 
 export const getPositionsListFromInstruction = (
@@ -14,13 +14,13 @@ export const getPositionsListFromInstruction = (
   const direction = instruction.slice(0, 1);
   const distance = parseInt(instruction.slice(1));
 
-  const isHorizontalMovement = direction == "R" || direction === "L" ? 0 : 1;
-  const isMovementInNegativeDirection =  direction === "D" || direction === "L";
+  const isHorizontalMovement = direction == 'R' || direction === 'L' ? 0 : 1;
+  const isMovementInNegativeDirection =  direction === 'D' || direction === 'L';
 
-  let index:number;
-  let positions:Array<{position:string}> = (currentPositonList) ? currentPositonList : [];
+  let index: number;
+  const positions: Array<{position: string}> = (currentPositonList) ? currentPositonList : [];
 
-  let from = (currentPositonList && currentPositonList.length > 0) ? currentPositonList[currentPositonList.length-1].position.split(",").map(s => parseInt(s)) : [0,0]
+  const from = (currentPositonList && currentPositonList.length > 0) ? currentPositonList[currentPositonList.length-1].position.split(',').map(s => parseInt(s)) : [0,0];
 
   for(
     index = from[isHorizontalMovement];
@@ -36,7 +36,7 @@ export const getPositionsListFromInstruction = (
   }
 
   return positions;
-}
+};
 
 export const findCrossingsBetweenTwoWires = (
   positionLists: [ListObject[], ListObject[]]
@@ -44,8 +44,8 @@ export const findCrossingsBetweenTwoWires = (
   const positions1 = positionLists[0].map(p => p.position);
   const positions2 = positionLists[1].map(p => p.position);
   const foundCrossings = positions1
-  .filter(p => positions2.includes(p))
-  .map(p => {return {position: p }});
+    .filter(p => positions2.includes(p))
+    .map(p => {return { position: p };});
   return foundCrossings;
 };
 
@@ -53,8 +53,8 @@ export const getClosestDistance = (
   foundCrossings: Crossing[]
 ): number => {
   let closestDistance = Infinity;
-  for (let crossing of foundCrossings) {
-    let positions = crossing.position.split(",").map(s => parseInt(s));
+  for (const crossing of foundCrossings) {
+    const positions = crossing.position.split(',').map(s => parseInt(s));
     const currentDistance = Math.abs(positions[0]) + Math.abs(positions[1]);
     closestDistance = closestDistance > currentDistance ? currentDistance : closestDistance;
   }
@@ -62,10 +62,10 @@ export const getClosestDistance = (
 };
 
 export const solveInput = (WiresInstructions: [Array<string>,Array<string>]): number => {  
-  let wire1Positions:ListObject[] = [];
+  let wire1Positions: ListObject[] = [];
   WiresInstructions[0].flatMap(instruction => wire1Positions = getPositionsListFromInstruction(instruction, wire1Positions));
   
-  let wire2Positions:ListObject[] = [];
+  let wire2Positions: ListObject[] = [];
   WiresInstructions[1].flatMap(instruction => wire2Positions = getPositionsListFromInstruction(instruction, wire2Positions));
   
   const crossings = findCrossingsBetweenTwoWires([wire1Positions, wire2Positions]);  

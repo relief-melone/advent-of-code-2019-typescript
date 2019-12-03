@@ -1,3 +1,3 @@
-import { solvePuzzle } from "./execOpCode";
+import { solvePuzzle } from './execOpCode';
 
-solvePuzzle("input.02.01.txt");
+solvePuzzle('input.02.01.txt');
