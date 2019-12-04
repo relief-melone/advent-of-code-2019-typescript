@@ -8,8 +8,8 @@ import {
 } from '../src/03.01/exec';
 import { expect } from 'chai';
 
-const testSolveInput = (input: [string[], string[]], output: number) => {
-  it(`Will correctly calculate a distance of ${output} for ${JSON.stringify(
+const testSolveInput = (input: [string[], string[]], output: number): void => {
+  it(`will correctly calculate a distance of ${output} for ${JSON.stringify(
     input
   ).slice(0, 10)}...`, () => {
     expect(solveInput(input)).to.equal(output);
@@ -21,7 +21,7 @@ const testGetPositionsListFromInstructions = (
   currentPositionList: any,
   expectedResult: any
 ): void => {
-  it(`Will return the correct list for instruction ${instruction}`, () => {
+  it(`will return the correct list for instruction ${instruction}`, () => {
     const list = getPositionsListFromInstruction(instruction, currentPositionList);
     expect(list).to.deep.equal(expectedResult);
   });

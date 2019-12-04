@@ -3,8 +3,8 @@ import {
 } from '../src/03.02/exec';
 import { expect } from 'chai';
 
-const testSolveInput = (input: [string[], string[]], output: number) => {
-  it(`Will correctly calculate a distance of ${output} for ${JSON.stringify(
+const testSolveInput = (input: [string[], string[]], output: number): void => {
+  it(`will correctly calculate a distance of ${output} for ${JSON.stringify(
     input
   ).slice(0, 10)}...`, () => {
     expect(solveInput(input)).to.equal(output);
