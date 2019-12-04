@@ -34,7 +34,6 @@ export const getPositionsListFromInstruction = (
       position: !isHorizontalMovement ? `${insetedIndex},${from[1]}` : `${from[0]},${insetedIndex}`
     });
   }
-
   return positions;
 };
 
