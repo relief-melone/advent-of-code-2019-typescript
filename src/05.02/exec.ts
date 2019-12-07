@@ -9,7 +9,7 @@ export class IntCodeComputer {
   output: number[];
 
 
-  constructor(program: number[], input:number){
+  constructor(program: number[], input: number){
     this.program = program;
     this.currentIndex = 0;
     this.nextIndex = 0;
@@ -45,7 +45,7 @@ export class IntCodeComputer {
       case 99:
         return false;
       default:        
-        throw "Unkown Op Code"       
+        throw 'Unkown Op Code';       
     }
 
     this.nextIndex = this.currentIndex + stepGap;
@@ -60,7 +60,7 @@ export class IntCodeComputer {
     switch(this.currentOpCode){
       // Add
       case 1:        
-        this.program[this.currentInstruction[3]] = param1+param2
+        this.program[this.currentInstruction[3]] = param1+param2;
         break;
       // Multiply
       case 2:        
@@ -101,7 +101,7 @@ export class IntCodeComputer {
 }
 
 
-export const solveInput = (inputs: number[],input:number) => {
+export const solveInput = (inputs: number[],input: number): IntCodeComputer => {
   const intComupter = new IntCodeComputer(inputs, input);
   while(intComupter.loadNextInstruction()){
     intComupter.execute();
