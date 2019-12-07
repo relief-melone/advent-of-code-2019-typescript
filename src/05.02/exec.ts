@@ -33,11 +33,19 @@ export class IntCodeComputer {
       case 3:
       case 4:
         stepGap = 2;        
-        break;       
+        break;  
+      case 5:
+      case 6:
+        stepGap = 3;     
+        break;
+      case 7:
+      case 8:
+        stepGap =  4;
+        break;
       case 99:
         return false;
       default:        
-        return false;        
+        throw "Unkown Op Code"       
     }
 
     this.nextIndex = this.currentIndex + stepGap;
@@ -47,22 +55,35 @@ export class IntCodeComputer {
   }
   
   execute(): void{
+    const param1 = this.parameterModes[0] ? this.currentInstruction[1]: this.program[this.currentInstruction[1]];
+    const param2 = this.parameterModes[1] ? this.currentInstruction[2]: this.program[this.currentInstruction[2]];
     switch(this.currentOpCode){
-      case 1:
-        const summand1 = this.parameterModes[0] ? this.currentInstruction[1] : this.program[this.currentInstruction[1]];
-        const summand2 = this.parameterModes[1] ? this.currentInstruction[2] : this.program[this.currentInstruction[2]];
-        this.program[this.currentInstruction[3]] = summand1+summand2
+      // Add
+      case 1:        
+        this.program[this.currentInstruction[3]] = param1+param2
         break;
-      case 2:
-        const factor1 = this.parameterModes[0] ? this.currentInstruction[1]: this.program[this.currentInstruction[1]];
-        const factor2 = this.parameterModes[1] ?  this.currentInstruction[2]: this.program[this.currentInstruction[2]];
-        this.program[this.currentInstruction[3]] = factor1*factor2;
+      // Multiply
+      case 2:        
+        this.program[this.currentInstruction[3]] = param1*param2;
         break;
+      // Input and Save To Address
       case 3:
         this.program[this.currentInstruction[1]] = this.input;
         break;
       case 4:
         this.output.push(this.program[this.currentInstruction[1]]);
+        break;
+      case 5:        
+        if(param1) this.nextIndex = param2;
+        break;
+      case 6:        
+        if(!param1) this.nextIndex = param2;
+        break;
+      case 7:
+        this.program[this.currentInstruction[3]] = param1 < param2 ? 1 : 0;
+        break;
+      case 8:
+        this.program[this.currentInstruction[3]] = param1 === param2 ? 1 : 0;
         break;
       default:
         throw 'No known Method';
