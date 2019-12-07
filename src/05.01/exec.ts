@@ -3,96 +3,87 @@ export class IntCodeComputer {
   currentInstruction: number[];
   currentIndex: number;
   nextIndex: number;
-  currentOpCode;
+  currentOpCode: number;
+  input: number;
+  parameterModes: number[];
+  output: number[];
 
-  constructor(input: number[]){
-    this.program = input;
+
+  constructor(program: number[], input:number){
+    this.program = program;
     this.currentIndex = 0;
     this.nextIndex = 0;
     this.currentInstruction = [];
     this.currentOpCode = 0;
+    this.input = input;
+    this.parameterModes = [];
+    this.output = [];
   }
 
-  loadNextInstruction(): void{
+  loadNextInstruction(): boolean{
     this.currentIndex = this.nextIndex;
+    this.disassembleOpValue(this.program[this.currentIndex]);
     let stepGap;
-    switch(this.program[this.currentIndex]){
+    switch(this.currentOpCode){
       // Add
       case 1:
       case 2:
         stepGap = 4;        
         break;
-      // Multiply
       case 3:
+      case 4:
         stepGap = 2;        
         break;       
-      case 4:
-        break;
       case 99:
-        return;
-        break;
+        return false;
       default:        
-        throw 'Unknown Op Code';
-        
+        return false;        
     }
-    this.nextIndex = this.currentIndex +4;
-    this.currentInstruction = this.program.slice(this.currentIndex, this.nextIndex-1);
+
+    this.nextIndex = this.currentIndex + stepGap;
+    this.currentInstruction = this.program.slice(this.currentIndex, this.nextIndex);
+    
+    return true;
   }
   
-  execute(Method: string): void{
-    switch(Method){
-      case 'Add':
+  execute(): void{
+    switch(this.currentOpCode){
+      case 1:
+        const summand1 = this.parameterModes[0] ? this.currentInstruction[1] : this.program[this.currentInstruction[1]];
+        const summand2 = this.parameterModes[1] ? this.currentInstruction[2] : this.program[this.currentInstruction[2]];
+        this.program[this.currentInstruction[3]] = summand1+summand2
+        break;
+      case 2:
+        const factor1 = this.parameterModes[0] ? this.currentInstruction[1]: this.program[this.currentInstruction[1]];
+        const factor2 = this.parameterModes[1] ?  this.currentInstruction[2]: this.program[this.currentInstruction[2]];
+        this.program[this.currentInstruction[3]] = factor1*factor2;
+        break;
+      case 3:
+        this.program[this.currentInstruction[1]] = this.input;
+        break;
+      case 4:
+        this.output.push(this.program[this.currentInstruction[1]]);
         break;
       default:
         throw 'No known Method';
     }
   }
+  disassembleOpValue = (values: number): void => {
+    const strSeries = values.toString();
+    this.currentOpCode = parseInt(strSeries.slice(strSeries.length-2));
+    this.parameterModes = [
+      parseInt(strSeries.slice(strSeries.length-3,strSeries.length-2) || '0'),
+      parseInt(strSeries.slice(strSeries.length-4,strSeries.length-3) || '0'),
+      parseInt(strSeries.slice(strSeries.length-5,strSeries.length-4) || '0')
+    ];
+  };
 }
 
 
-
-export const disassembleOpValue = (values: number): number[] => {
-  const strSeries = values.toString();
-  const result: number[] = [];
-  result[0] = parseInt(strSeries.slice(strSeries.length-2));
-  result[1] = parseInt(strSeries.slice(strSeries.length-3,strSeries.length-2) || '0');
-  result[2] = parseInt(strSeries.slice(strSeries.length-4,strSeries.length-3) || '0');
-  result[3] = parseInt(strSeries.slice(strSeries.length-5,strSeries.length-4) || '0');
-
-  return result;
-};
-
-export const getInstructions = (index: number, Program: number[]): number[] => {
-
-};
-
-export const getParameters = (Instructon: number[]): number[] => {
-  
-};
-
-export const executeInstruction = (Instruction: number[], Program: number[]): void => {
-  const opSet = disassembleOpValue(Instruction[0]);
-  opCodeLoop: switch(opSet[0]){
-    // Add
-    case 1:      
-      break;
-    // Multiply
-    case 2:
-      break;
-    // Store Input
-    case 3:
-      break;
-    // Ouput
-    case 4:
-      break;
-    case 99:
-      break opCodeLoop;
-    default:
-      throw 'Unknown Op Code';
+export const solveInput = (inputs: number[],input:number) => {
+  const intComupter = new IntCodeComputer(inputs, 1);
+  while(intComupter.loadNextInstruction()){
+    intComupter.execute();
   }
-};
-
-export const solveInput = (input: string[]) => {
-
-
+  return intComupter;
 };
