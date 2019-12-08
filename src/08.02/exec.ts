@@ -29,7 +29,7 @@ const printGrid = (grid: number[][]): void => {
   for(let w = 0; w< grid.length; w++){
     let line = '';
     for(let h=0;h<grid[w].length;h++){
-      line+= grid[w][h] ? '.' : ' ';
+      line+= grid[w][h] ? '\u2B1C' : ' ';
     }
     console.log(line);
   }
