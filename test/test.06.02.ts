@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { getPathToRoot, solveInput } from '../src/06.02/exec';
 import findFirstEqualElementIn2Arrays from '../src/shared/findFirstEqualElementIn2Arrays';
 
-describe.only('Day 6 - Second Puzzle', () => {
+describe('Day 6 - Second Puzzle', () => {
   it('return correct path to root orbit', () => {
     expect(getPathToRoot('E', {
       'COM' : null,
