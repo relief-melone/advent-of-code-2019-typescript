@@ -25,7 +25,7 @@ export const layerToGrid = (layer: number[], width: number, height: number): num
   return result;
 };
 
-const printGrid = (grid: number[][]) => {
+const printGrid = (grid: number[][]): void => {
   for(let w = 0; w< grid.length; w++){
     let line = '';
     for(let h=0;h<grid[w].length;h++){
