@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { getObjectListFromInput, setPartentsInList, countParents } from '../src/06.01/exec';
 
-describe.only('Day 6 - First Puzzle', () => {
+describe('Day 6 - First Puzzle', () => {
   it('return correct object list from input', () => {
     expect(getObjectListFromInput([
       'COM)B',
