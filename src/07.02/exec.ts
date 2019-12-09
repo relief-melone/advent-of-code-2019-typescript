@@ -12,6 +12,7 @@ export class Amplifier {
   output: number[];
   iterations: number;
   emitter: EventEmitter;
+  status: string;
 
   private phaseHasBeenSet: boolean;
 
@@ -27,6 +28,7 @@ export class Amplifier {
     this.output = [];
     this.iterations =0;
     this.emitter = new EventEmitter();
+    this.status = 'running';
   }
 
   get input(): number{
@@ -65,12 +67,14 @@ export class Amplifier {
         stepGap =  4;
         break;
       case 99:
+        this.emitter.emit('finished');
+        this.status = 'finished';
         return false;
       default:        
-        throw 'Unkown Op Code';       
+        throw `Unkown Op Code: ${this.currentOpCode}`;       
     }
 
-    this.nextIndex = this.currentIndex + stepGap;
+    this.nextIndex = (this.currentIndex + stepGap)%this.program.length;
     this.currentInstruction = this.program.slice(this.currentIndex, this.nextIndex);
     
     return true;
@@ -109,8 +113,12 @@ export class Amplifier {
       case 8:
         this.program[this.currentInstruction[3]] = param1 === param2 ? 1 : 0;
         break;
+      case 99:
+        this.emitter.emit('finished');
+        this.status = 'finished';
+        break;
       default:
-        throw 'No known Method';
+        throw `Unkown Method: ${this.currentOpCode}`;
     }
   }
   disassembleOpValue = (values: number): void => {
@@ -122,6 +130,19 @@ export class Amplifier {
       parseInt(strSeries.slice(strSeries.length-5,strSeries.length-4) || '0')
     ];
   };
+
+  executeUntilOutput(): void{
+    let outputGenerated = false;
+    this.emitter.once('output', () => outputGenerated=true);
+    let moreInstructionsLeft = true;
+    while(
+      moreInstructionsLeft && 
+      !outputGenerated
+    ){
+      moreInstructionsLeft = this.loadNextInstruction();      
+      this.execute();     
+    }
+  }
 
   executeAll(): void{
     while(this.loadNextInstruction()){
@@ -137,15 +158,21 @@ export const getOutputForSequence = (
   initialInput = 0
 ): number => {
   let output = initialInput;
-  const amplifiers: Amplifier[] = [];
-  for(let i=0; i<sequence.length; i++){
-    const phase = sequence[i];
-    const amp = new Amplifier(program, [phase, output]);
-    amp.on;
-    
-    amp.executeAll();
-    output = amp.lastOutput;
+  const amplifiers: Amplifier[] = [];  
+  let oneAmpFinished = false;
+  
+  while(!oneAmpFinished){
+    for(let i=0; i<sequence.length; i++){
+      const phase = sequence[i];
+      if(!amplifiers[i]) amplifiers[i] = new Amplifier(program, [phase, output]);
+      const amp = amplifiers[i];
+      amp.inputs[1] = output;      
+      amp.executeUntilOutput();      
+      if(amp.status === 'finished') oneAmpFinished = true;
+      output = amp.lastOutput;
+    }
   }
+  
   return output;
 };
 
