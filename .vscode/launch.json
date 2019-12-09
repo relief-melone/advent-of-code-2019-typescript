@@ -6,7 +6,7 @@
       "request": "launch",
       "name": "2019",
       "program": "${workspaceFolder}\\dist\\src\\index.js",
-      "args": ["07.02"],
+      "args": ["08.01"],
       "outFiles": ["${workspaceFolder}/**/*.js"],
       "console": "integratedTerminal"
     },
