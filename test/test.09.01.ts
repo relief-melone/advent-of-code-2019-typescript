@@ -1,21 +1,28 @@
 import { expect } from 'chai';
-import { getOutputForSequence } from '../src/07.02/exec';
+import { solveInput } from '../src/09.01/exec';
 
 
-const test = (sequence, program, expected): void => {
-  it('will return the correct thruster signal', ()=> {
-    expect(getOutputForSequence(
-      sequence,
+const test = (program, expected): void => {
+  it('will match the expected', ()=> {    
+    expect(solveInput(
       program,
-      expected
-    ));
+    )).to.deep.equal(expected);  
+    
   });
 };
 
-describe.only('Day 7 - Second Puzzle', () => {
-  test([9,8,7,6,5],[3,26,1001,26,-4,26,3,27,1002,27,2,27,1,27,26,27,4,27,1001,28,-1,28,1005,28,6,99,0,0,5],139629729);
-  test([9,7,8,5,6], [3,52,1001,52,-5,52,3,53,1,52,56,54,1007,54,5,55,1005,55,26,1001,54,
-    -5,54,1105,1,12,1,53,54,53,1008,54,0,55,1001,55,1,55,2,53,55,53,4,
-    53,1001,56,-1,56,1005,56,6,99,0,0,0,0,10],18216);
-  // test([1,0,4,3,2,],[3,31,3,32,1002,32,10,32,1001,31,-2,31,1007,31,0,33,1002,33,7,33,1,33,31,31,1,32,31,31,4,31,99,0,0,0], 65210);
+describe.only('Day 9 - First Puzzle', async () => {
+  test([109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99], [109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99]);
+  test([1102,34915192,34915192,7,4,7,99,0],[1234]);
+  test([104,1125899906842624,99],[1125899906842624]);
+  
+  
+
+  // it('correctly converts a layer into a grid', () => {
+  //   expect(layerToGrid([1,2,3,4,5,6],3,2)).to.deep.equal([
+  //     [1,2,3],
+  //     [4,5,6]
+  //   ]);
+  // });
+  
 });

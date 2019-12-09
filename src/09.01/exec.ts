@@ -1,6 +1,6 @@
 import EventEmitter from 'events';
 
-export class Amplifier {
+export class IntCodeComputer {
   program: number[];
   currentInstruction: number[];
   currentIndex: number;
@@ -37,7 +37,7 @@ export class Amplifier {
       this.phaseHasBeenSet = true;
       return this.inputs[0];
     } else {
-      return this.inputs[1];
+      return this.inputs[this.inputs.length -1];
     }    
   }
 
@@ -65,7 +65,10 @@ export class Amplifier {
         break;
       case 7:
       case 8:
-        stepGap =  4;
+        stepGap = 4;
+        break;
+      case 9:
+        stepGap = 2;
         break;
       case 99:
         this.emitter.emit('finished');
@@ -75,32 +78,35 @@ export class Amplifier {
         throw `Unkown Op Code: ${this.currentOpCode}`;       
     }
 
-    this.nextIndex = (this.currentIndex + stepGap)%this.program.length;
+    this.nextIndex = this.currentIndex + stepGap;
     this.currentInstruction = this.program.slice(this.currentIndex, this.nextIndex);
+    this.cleanProgram();
     
     return true;
   }
   
   execute(): void{
     this.iterations++;
-    const param1 = this.getParameter(0);
-    const param2 = this.getParameter(1);
+    if(this.currentOpCode === 99){
+      this.status = 'finished';
+      return;
+    }
+    const param1 = this.getParameter(0) || 0;
+    const param2 = this.getParameter(1) || 0;
+    const param3 = this.getParameter(2) || 0;
     switch(this.currentOpCode){
-      // Add
       case 1:        
         this.program[this.currentInstruction[3]] = param1+param2;
         break;
-      // Multiply
       case 2:        
         this.program[this.currentInstruction[3]] = param1*param2;
         break;
-      // Input and Save To Address
       case 3:
-        this.program[this.currentInstruction[1]] = this.input;
+        this.program[param1] = this.input;
         break;
       case 4:
-        this.output.push(this.program[this.currentInstruction[1]]);
-        this.emitter.emit('output', this.program[this.currentInstruction[1]]);
+        this.output.push(this.program[param1]);
+        this.emitter.emit('output', this.program[param1]);
         break;
       case 5:        
         if(param1) this.nextIndex = param2;
@@ -114,9 +120,8 @@ export class Amplifier {
       case 8:
         this.program[this.currentInstruction[3]] = param1 === param2 ? 1 : 0;
         break;
-      case 99:
-        this.emitter.emit('finished');
-        this.status = 'finished';
+      case 9:
+        this.relativeBase = this.relativeBase + param1;
         break;
       default:
         throw `Unkown Method: ${this.currentOpCode}`;
@@ -132,9 +137,9 @@ export class Amplifier {
         return this.currentInstruction[returnIndex];
       case 2:
         if(!this.relativeBase) return this.getParameter(parameterIndex);
-        return this.program[this.currentInstruction[returnIndex] + this.currentIndex];
+        return this.currentInstruction[returnIndex] + this.relativeBase;
       default:
-        throw `Unkown: Parameter Mode: ${this.parameterModes[parameterIndex]}`;
+        throw `Unkown Parameter Mode: ${this.parameterModes[parameterIndex]}`;
     }
   }
   disassembleOpValue = (values: number): void => {
@@ -146,56 +151,61 @@ export class Amplifier {
       parseInt(strSeries.slice(strSeries.length-5,strSeries.length-4) || '0')
     ];
   };
+  
+  cleanProgram(): void{
+    for(let i =0;i<this.program.length; i++){
+      if(this.program[i] === undefined) this.program[i] = 0;
+    }
+  }
 
   executeUntilOutput(): void{
     let outputGenerated = false;
     this.emitter.once('output', () => outputGenerated=true);
-    let moreInstructionsLeft = true;
     while(
-      moreInstructionsLeft && 
+      this.status !== 'finished' && 
       !outputGenerated
     ){
-      moreInstructionsLeft = this.loadNextInstruction();      
-      this.execute();     
+      this.loadNextInstruction();      
+      this.execute();
+       
     }
   }
 
   executeAll(): void{
-    while(this.loadNextInstruction()){
+    while(this.status !== 'finished'){
+      this.loadNextInstruction();     
       this.execute();
     }
   }
 }
 
 
-export const getOutputForSequence = (
-  sequence: number[], 
-  program: number[],
-  initialInput = 0
-): number => {
-  let output = initialInput;
-  const amplifiers: Amplifier[] = [];  
-  let oneAmpFinished = false;
+// export const getOutputForSequence = (
+//   sequence: number[], 
+//   program: number[],
+//   initialInput = 0
+// ): number => {
+//   let output = initialInput;
+//   const amplifiers: Amplifier[] = [];  
+//   let oneAmpFinished = false;
   
-  while(!oneAmpFinished){
-    for(let i=0; i<sequence.length; i++){
-      const phase = sequence[i];
-      if(!amplifiers[i]) amplifiers[i] = new Amplifier(program, [phase, output]);
-      const amp = amplifiers[i];
-      amp.inputs[1] = output;      
-      amp.executeUntilOutput();      
-      if(amp.status === 'finished') oneAmpFinished = true;
-      output = amp.lastOutput;
-    }
-  }
+//   while(!oneAmpFinished){
+//     for(let i=0; i<sequence.length; i++){
+//       const phase = sequence[i];
+//       if(!amplifiers[i]) amplifiers[i] = new Amplifier(program, [phase, output]);
+//       const amp = amplifiers[i];
+//       amp.inputs[1] = output;      
+//       amp.executeUntilOutput();      
+//       if(amp.status === 'finished') oneAmpFinished = true;
+//       output = amp.lastOutput;
+//     }
+//   }
   
-  return output;
-};
+//   return output;
+// };
 
-export const solveInput = (sequences: number[][], program: number[]): number => {
-  const thrusterSignals: number[] = [];
-  for(let i=0; i<sequences.length; i++){
-    thrusterSignals.push(getOutputForSequence(sequences[i], program, 0));
-  }
-  return thrusterSignals.sort((a,b) => b-a)[0];
+export const solveInput = (program: number[]): number[] => {
+  const intComputer = new IntCodeComputer(program, [0]);
+  intComputer.executeAll();
+  return intComputer.output;
 };
