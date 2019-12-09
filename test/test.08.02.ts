@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { mergeLayers, layerToGrid } from '../src/08.02/exec';
 
-describe.only('Day 8 - Second Puzzle', () => {
+describe('Day 8 - Second Puzzle', () => {
   it('correctly merges layers', () => {
     expect(mergeLayers([
       [0,2,2,2],
