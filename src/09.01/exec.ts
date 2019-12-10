@@ -23,10 +23,10 @@ export class IntCodeComputer {
     this.currentInstruction = [];
     this.currentOpCode = 0;
     this.inputs = inputs;
-    this.phaseHasBeenSet =false;
+    this.phaseHasBeenSet = false;
     this.parameterModes = [];
     this.output = [];
-    this.iterations =0;
+    this.iterations = 0;
     this.emitter = new EventEmitter();
     this.status = 'running';
     this.relativeBase = 0;
@@ -37,12 +37,12 @@ export class IntCodeComputer {
       this.phaseHasBeenSet = true;
       return this.inputs[0];
     } else {
-      return this.inputs[this.inputs.length -1];
+      return this.inputs[this.inputs.length - 1];
     }    
   }
 
   get lastOutput(): number{
-    return this.output[this.output.length -1];
+    return this.output[this.output.length - 1];
   }
 
   loadNextInstruction(): boolean{
@@ -91,76 +91,85 @@ export class IntCodeComputer {
       this.status = 'finished';
       return;
     }
-    const param1 = this.getParameter(0) || 0;
-    const param2 = this.getParameter(1) || 0;
-    const param3 = this.getParameter(2) || 0;
     switch(this.currentOpCode){
       case 1:        
-        this.program[this.currentInstruction[3]] = param1+param2;
+        this.program[this.getParameter(2, true)] 
+        = this.getParameter(0) + this.getParameter(1);
+        console.log(`Adding ${this.getParameter(0)} and ${this.getParameter(1)} and saving to address ${this.getParameter(2)}`);
         break;
       case 2:        
-        this.program[this.currentInstruction[3]] = param1*param2;
+        this.program[this.getParameter(2, true)] 
+        = this.getParameter(0) * this.getParameter(1);
+        console.log(`Multiplying ${this.getParameter(0)} and ${this.getParameter(1)} and saving to address ${this.getParameter(2)}`);
         break;
       case 3:
-        this.program[param1] = this.input;
+        this.program[this.getParameter(0, true)] = this.input;
+        console.log(`Saving input ${this.input} to ${this.getParameter(0)}`);
         break;
       case 4:
-        this.output.push(this.program[param1]);
-        this.emitter.emit('output', this.program[param1]);
+        this.output.push(this.getParameter(0));
+        this.emitter.emit('output', this.program[this.getParameter(0)]);
+        console.log(`Outputting ${this.getParameter(0)}`);
         break;
       case 5:        
-        if(param1) this.nextIndex = param2;
+        if(this.getParameter(0)) this.nextIndex = this.getParameter(1);
+        
         break;
       case 6:        
-        if(!param1) this.nextIndex = param2;
+        if(!this.getParameter(0)) this.nextIndex = this.getParameter(1);
         break;
       case 7:
-        this.program[this.currentInstruction[3]] = param1 < param2 ? 1 : 0;
+        this.program[this.getParameter(2, true)] 
+        = this.getParameter(0) < this.getParameter(1) ? 1 : 0;
         break;
       case 8:
-        this.program[this.currentInstruction[3]] = param1 === param2 ? 1 : 0;
+        this.program[this.getParameter(2, true)] 
+        = this.getParameter(0) === this.getParameter(1) ? 1 : 0;
         break;
       case 9:
-        this.relativeBase = this.relativeBase + param1;
+        this.relativeBase = this.relativeBase + this.currentInstruction[1];
         break;
       default:
         throw `Unkown Method: ${this.currentOpCode}`;
     }
   }
 
-  getParameter(parameterIndex: number): number{
-    const returnIndex = parameterIndex+1;
-    switch(this.parameterModes[parameterIndex]){
+  getParameter(parameterIndex: number, actionIsWrite = false): number{
+    const returnIndex = parameterIndex + 1;
+    const parameterMode = this.parameterModes[parameterIndex];
+    if(parameterMode === 1 && actionIsWrite) return this.program[this.currentInstruction[returnIndex]];
+    switch(parameterMode){
       case 0: 
-        return this.program[this.currentInstruction[returnIndex]];
+        return this.program[this.currentInstruction[returnIndex]] || 0;
       case 1:
-        return this.currentInstruction[returnIndex];
+        return this.currentInstruction[returnIndex] || 0;
       case 2:
-        if(!this.relativeBase) return this.getParameter(parameterIndex);
+        if(!this.relativeBase) return this.program[this.currentInstruction[returnIndex]] || 0;
         return this.currentInstruction[returnIndex] + this.relativeBase;
       default:
         throw `Unkown Parameter Mode: ${this.parameterModes[parameterIndex]}`;
     }
   }
-  disassembleOpValue = (values: number): void => {
+  disassembleOpValue = (values: number, minlength = 4): void => {
     const strSeries = values.toString();
-    this.currentOpCode = parseInt(strSeries.slice(strSeries.length-2));
-    this.parameterModes = [
-      parseInt(strSeries.slice(strSeries.length-3,strSeries.length-2) || '0'),
-      parseInt(strSeries.slice(strSeries.length-4,strSeries.length-3) || '0'),
-      parseInt(strSeries.slice(strSeries.length-5,strSeries.length-4) || '0')
-    ];
+    this.currentOpCode = parseInt(strSeries.slice(strSeries.length - 2));
+    this.parameterModes = [];
+    for(let i = 2; i <= minlength; i++){
+      this.parameterModes.push(
+        parseInt(strSeries.slice(strSeries.length - i - 1, strSeries.length - i) || '0')
+      );
+    }
   };
   
   cleanProgram(): void{
-    for(let i =0;i<this.program.length; i++){
+    for(let i = 0;i < this.program.length; i++){
       if(this.program[i] === undefined) this.program[i] = 0;
     }
   }
 
   executeUntilOutput(): void{
     let outputGenerated = false;
-    this.emitter.once('output', () => outputGenerated=true);
+    this.emitter.once('output', () => outputGenerated = true);
     while(
       this.status !== 'finished' && 
       !outputGenerated
@@ -178,31 +187,6 @@ export class IntCodeComputer {
     }
   }
 }
-
-
-// export const getOutputForSequence = (
-//   sequence: number[], 
-//   program: number[],
-//   initialInput = 0
-// ): number => {
-//   let output = initialInput;
-//   const amplifiers: Amplifier[] = [];  
-//   let oneAmpFinished = false;
-  
-//   while(!oneAmpFinished){
-//     for(let i=0; i<sequence.length; i++){
-//       const phase = sequence[i];
-//       if(!amplifiers[i]) amplifiers[i] = new Amplifier(program, [phase, output]);
-//       const amp = amplifiers[i];
-//       amp.inputs[1] = output;      
-//       amp.executeUntilOutput();      
-//       if(amp.status === 'finished') oneAmpFinished = true;
-//       output = amp.lastOutput;
-//     }
-//   }
-  
-//   return output;
-// };
 
 export const solveInput = (program: number[]): number[] => {
   const intComputer = new IntCodeComputer(program, [0]);
