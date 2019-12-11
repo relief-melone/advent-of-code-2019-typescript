@@ -23,13 +23,8 @@ export class IntCodeComputer {
     this.nextIndex = 0;
     this.currentInstruction = [];
     this.currentOpCode = 0;
-<<<<<<< HEAD
     this.inputQueue = inputs;
-    this.phaseHasBeenSet =false;
-=======
-    this.inputs = inputs;
     this.phaseHasBeenSet = false;
->>>>>>> 1be98665d476967aeda09ef0506da306fffc3337
     this.parameterModes = [];
     this.output = [];
     this.iterations = 0;
@@ -38,18 +33,6 @@ export class IntCodeComputer {
     this.relativeBase = 0;
   }
 
-<<<<<<< HEAD
-=======
-  get input(): number{
-    if(!this.phaseHasBeenSet){
-      this.phaseHasBeenSet = true;
-      return this.inputs[0];
-    } else {
-      return this.inputs[this.inputs.length - 1];
-    }    
-  }
-
->>>>>>> 1be98665d476967aeda09ef0506da306fffc3337
   get lastOutput(): number{
     return this.output[this.output.length - 1];
   }
@@ -106,22 +89,6 @@ export class IntCodeComputer {
     }
     switch(this.currentOpCode){
       case 1:        
-<<<<<<< HEAD
-        this.program[this.getParameter(2)] = this.getParameter(0)+this.getParameter(1);
-        break;
-      case 2:        
-        this.program[this.getParameter(2)] = this.getParameter(0)*this.getParameter(1);
-        break;
-      case 3:
-        this.program[this.getParameter(0)] = this.inputQueue.shift() || 0;
-        break;
-      case 4:
-        this.output.push(this.program[this.getParameter(0)]);
-        this.emitter.emit('output', this.program[this.getParameter(0)]);
-        break;
-      case 5:        
-        if(this.getParameter(0)) this.nextIndex = this.getParameter(1);
-=======
         this.program[this.getParameter(2, true)] 
         = this.getParameter(0) + this.getParameter(1);
         console.log(`Adding ${this.getParameter(0)} and ${this.getParameter(1)} and saving to address ${this.getParameter(2)}`);
@@ -132,8 +99,8 @@ export class IntCodeComputer {
         console.log(`Multiplying ${this.getParameter(0)} and ${this.getParameter(1)} and saving to address ${this.getParameter(2)}`);
         break;
       case 3:
-        this.program[this.getParameter(0, true)] = this.input;
-        console.log(`Saving input ${this.input} to ${this.getParameter(0)}`);
+        this.program[this.getParameter(0, true)] = this.inputQueue.shift() || 0;
+        console.log(`Saving input ${this.program[this.getParameter(0, true)]} to ${this.getParameter(0)}`);
         break;
       case 4:
         this.output.push(this.getParameter(0));
@@ -143,21 +110,11 @@ export class IntCodeComputer {
       case 5:        
         if(this.getParameter(0)) this.nextIndex = this.getParameter(1);
         
->>>>>>> 1be98665d476967aeda09ef0506da306fffc3337
         break;
       case 6:        
         if(!this.getParameter(0)) this.nextIndex = this.getParameter(1);
         break;
       case 7:
-<<<<<<< HEAD
-        this.program[this.getParameter(2)] = this.getParameter(0) < this.getParameter(1) ? 1 : 0;
-        break;
-      case 8:
-        this.program[this.getParameter(2)] = this.getParameter(0) === this.getParameter(1) ? 1 : 0;
-        break;
-      case 9:
-        this.relativeBase = this.relativeBase + this.getParameter(0);
-=======
         this.program[this.getParameter(2, true)] 
         = this.getParameter(0) < this.getParameter(1) ? 1 : 0;
         break;
@@ -167,7 +124,6 @@ export class IntCodeComputer {
         break;
       case 9:
         this.relativeBase = this.relativeBase + this.currentInstruction[1];
->>>>>>> 1be98665d476967aeda09ef0506da306fffc3337
         break;
       default:
         throw `Unkown Method: ${this.currentOpCode}`;
@@ -228,13 +184,9 @@ export class IntCodeComputer {
   }
 }
 
-<<<<<<< HEAD
 
 export const solveInput = (input: Input): number[] => {
   const program = input.byCommas().toNumber();
-=======
-export const solveInput = (program: number[]): number[] => {
->>>>>>> 1be98665d476967aeda09ef0506da306fffc3337
   const intComputer = new IntCodeComputer(program, [0]);
   intComputer.executeAll();
   return intComputer.output;
