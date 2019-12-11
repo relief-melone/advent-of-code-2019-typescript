@@ -17,13 +17,13 @@ export class IntCodeComputer {
 
   private phaseHasBeenSet: boolean;
 
-  constructor(program: number[], inputs: number[]){
+  constructor(program: number[]){
     this.program = [...program];
     this.currentIndex = 0;
     this.nextIndex = 0;
     this.currentInstruction = [];
     this.currentOpCode = 0;
-    this.inputQueue = inputs;
+    this.inputQueue = [];
     this.phaseHasBeenSet = false;
     this.parameterModes = [];
     this.output = [];
@@ -76,7 +76,6 @@ export class IntCodeComputer {
 
     this.nextIndex = this.currentIndex + stepGap;
     this.currentInstruction = this.program.slice(this.currentIndex, this.nextIndex);
-    this.cleanProgram();
     
     return true;
   }
@@ -89,61 +88,72 @@ export class IntCodeComputer {
     }
     switch(this.currentOpCode){
       case 1:        
-        this.program[this.getParameter(2, true)] 
-        = this.getParameter(0) + this.getParameter(1);
-        console.log(`Adding ${this.getParameter(0)} and ${this.getParameter(1)} and saving to address ${this.getParameter(2)}`);
+        this.program[this.getSaveParameter(2)] 
+        = this.getParameter(0) + this.getParameter(1);        
         break;
       case 2:        
-        this.program[this.getParameter(2, true)] 
-        = this.getParameter(0) * this.getParameter(1);
-        console.log(`Multiplying ${this.getParameter(0)} and ${this.getParameter(1)} and saving to address ${this.getParameter(2)}`);
+        this.program[this.getSaveParameter(2)] 
+        = this.getParameter(0) * this.getParameter(1);        
         break;
       case 3:
-        this.program[this.getParameter(0, true)] = this.inputQueue.shift() || 0;
-        console.log(`Saving input ${this.program[this.getParameter(0, true)]} to ${this.getParameter(0)}`);
+        this.program[this.getSaveParameter(0)] = this.inputQueue.shift() || 0;      
+        this.cleanProgram();  
         break;
       case 4:
         this.output.push(this.getParameter(0));
         this.emitter.emit('output', this.program[this.getParameter(0)]);
-        console.log(`Outputting ${this.getParameter(0)}`);
         break;
       case 5:        
         if(this.getParameter(0)) this.nextIndex = this.getParameter(1);
-        
         break;
       case 6:        
         if(!this.getParameter(0)) this.nextIndex = this.getParameter(1);
         break;
       case 7:
-        this.program[this.getParameter(2, true)] 
+        this.program[this.getSaveParameter(2)] 
         = this.getParameter(0) < this.getParameter(1) ? 1 : 0;
         break;
       case 8:
-        this.program[this.getParameter(2, true)] 
+        this.program[this.getSaveParameter(2)] 
         = this.getParameter(0) === this.getParameter(1) ? 1 : 0;
         break;
       case 9:
-        this.relativeBase = this.relativeBase + this.currentInstruction[1];
+        this.relativeBase = this.relativeBase + this.getParameter(0);
         break;
       default:
         throw `Unkown Method: ${this.currentOpCode}`;
     }
   }
 
-  getParameter(parameterIndex: number, actionIsWrite = false): number{
+  getSaveParameter(parameterIndex: number): number{
     const returnIndex = parameterIndex + 1;
     const parameterMode = this.parameterModes[parameterIndex];
-    if(parameterMode === 1 && actionIsWrite) return this.program[this.currentInstruction[returnIndex]];
+
     switch(parameterMode){
-      case 0: 
-        return this.program[this.currentInstruction[returnIndex]] || 0;
+      case 0:
+        return this.currentInstruction[returnIndex];
       case 1:
-        return this.currentInstruction[returnIndex] || 0;
+        return this.currentInstruction[returnIndex];
       case 2:
-        if(!this.relativeBase) return this.program[this.currentInstruction[returnIndex]] || 0;
+        if(!this.relativeBase) return this.currentInstruction[returnIndex] || 0;
         return this.currentInstruction[returnIndex] + this.relativeBase;
       default:
-        throw `Unkown Parameter Mode: ${this.parameterModes[parameterIndex]}`;
+        throw 'getSaveParameter: No known parameterMode';
+    }
+  }
+
+  getParameter(parameterIndex: number): number{
+    const returnIndex = parameterIndex + 1;
+    const parameterMode = this.parameterModes[parameterIndex];    
+    switch(parameterMode){
+      case 0: 
+        return this.program[this.currentInstruction[returnIndex]];
+      case 1:
+        return this.currentInstruction[returnIndex];
+      case 2:        
+        return this.program[this.currentInstruction[returnIndex] + this.relativeBase];
+      default:
+        throw `getParameter - no known ParameterMode: ${this.parameterModes[parameterIndex]}`;
     }
   }
   disassembleOpValue = (values: number, minlength = 4): void => {
@@ -184,10 +194,11 @@ export class IntCodeComputer {
   }
 }
 
-
-export const solveInput = (input: Input): number[] => {
-  const program = input.byCommas().toNumber();
-  const intComputer = new IntCodeComputer(program, [0]);
+export const solveInput = (programInput: Input, initialInput = 1): number[] => {
+  const program = programInput.byCommas().toNumber();
+  const intComputer = new IntCodeComputer(program);
+  intComputer.addInput(initialInput);
   intComputer.executeAll();
+  // console.log(intComputer.output);
   return intComputer.output;
 };
