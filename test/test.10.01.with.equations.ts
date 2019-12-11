@@ -32,7 +32,7 @@ const testAsteroidLocations = (input: string[][], expected: [number,number][]): 
   
 };
 
-describe('Day 10 - Puzzle 1', () => {
+describe.skip('Day 10 - Puzzle 1', () => {
   testGetPitch([3,1],[1,3],-1);
   testGetPitch([0,100],[-1,0],100);
   

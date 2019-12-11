@@ -26,33 +26,33 @@ const testAsteroidLocations = (input: string[][], expected: [number,number][]): 
   
 };
 
-describe.only('Day 10 - First Puzzle', () => {
-  // testGetConnectingVector([3,4],[4,4],[1,0]);
-  // testGetConnectingVector([1,1],[-5,2],[-6,1]);
+describe('Day 10 - First Puzzle', () => {
+  testGetConnectingVector([3,4],[4,4],[1,0]);
+  testGetConnectingVector([1,1],[-5,2],[-6,1]);
 
-  // testVectorsAreLinearDependent([1,5],[2,6], false);
-  // testVectorsAreLinearDependent([2,3],[4,6], true);
-  // testVectorsAreLinearDependent([1,0],[5,0], true);
-  // testVectorsAreLinearDependent([1,0],[5,0], true);
-  // testVectorsAreLinearDependent([0,1],[0,5], true);
-  // testVectorsAreLinearDependent([1,2],[-1,-2], false);
+  testVectorsAreLinearDependent([1,5],[2,6], false);
+  testVectorsAreLinearDependent([2,3],[4,6], true);
+  testVectorsAreLinearDependent([1,0],[5,0], true);
+  testVectorsAreLinearDependent([1,0],[5,0], true);
+  testVectorsAreLinearDependent([0,1],[0,5], true);
+  testVectorsAreLinearDependent([1,2],[-1,-2], false);
 
-  // testVectorsAreLinearDependent([1,0],[0,-2], false);
-  // testVectorsAreLinearDependent([1,0],[-3,-2], false);
+  testVectorsAreLinearDependent([1,0],[0,-2], false);
+  testVectorsAreLinearDependent([1,0],[-3,-2], false);
   testVectorsAreLinearDependent([1,0],[-1,0], false);
 
-  // testGetLongerLinearDependentVector([1,2],[2,4],[2,4]);
-  // testGetLongerLinearDependentVector([3,8],[6,16],[6,16]);
-  // testGetLongerLinearDependentVector([-3,-8],[-6,-16],[-6,-16]);
-  // testGetLongerLinearDependentVector([-3,8],[-6,16],[-6,16]);
+  testGetLongerLinearDependentVector([1,2],[2,4],[2,4]);
+  testGetLongerLinearDependentVector([3,8],[6,16],[6,16]);
+  testGetLongerLinearDependentVector([-3,-8],[-6,-16],[-6,-16]);
+  testGetLongerLinearDependentVector([-3,8],[-6,16],[-6,16]);
 
-  // testAsteroidLocations([
-  //   ['.','#','.','.','#'],
-  //   ['.','#','.','.','.']
-  // ],[
-  //   [1,0],
-  //   [4,0],
-  //   [1,1]
-  // ]);
+  testAsteroidLocations([
+    ['.','#','.','.','#'],
+    ['.','#','.','.','.']
+  ],[
+    [1,0],
+    [4,0],
+    [1,1]
+  ]);
 
 });

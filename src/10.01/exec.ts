@@ -64,5 +64,4 @@ export const checkHowManyInSight = (
         return false;
       }
     }).length;
-
 };
