@@ -139,11 +139,11 @@ export const shootAsteroidsAndReturnLastShot = (
   return shotDownAsteroids;
 };
 
-export const solveInput = (input: Input, nrOfAsteroidsToShoot: number): number => {
+export const solveInput = (input: Input, nrOfAsteroidsToShoot: number, positionOfStation: [number, number] = [31,20]): number => {
   
   const characters = input.byLines().items.map(l => l.split(''));
   const coordinates = getAsteroidLocations(characters);
-  const shotDown = shootAsteroidsAndReturnLastShot([11,13],coordinates,nrOfAsteroidsToShoot);
+  const shotDown = shootAsteroidsAndReturnLastShot(positionOfStation,coordinates,nrOfAsteroidsToShoot);
   const lastShotDown = shotDown[shotDown.length-1];
   return lastShotDown.Coordinates[0]*100+lastShotDown.Coordinates[1];
 };
