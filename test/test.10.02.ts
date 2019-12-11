@@ -30,7 +30,7 @@ const testSolveInput = (asteroidsToShoot, expected): void => {
 .#.#.###########.###
 #.#.#.#####.####.###
 ###.##.####.##.#..##`;
-    expect(solveInput(new Input(input, true),asteroidsToShoot)).to.equal(expected);
+    expect(solveInput(new Input(input, true),asteroidsToShoot,[11,13])).to.equal(expected);
   });
 };
 
