@@ -30,11 +30,11 @@ const testSolveInput = (asteroidsToShoot, expected): void => {
 .#.#.###########.###
 #.#.#.#####.####.###
 ###.##.####.##.#..##`;
-    expect(solveInput(new Input(input, true),asteroidsToShoot)).to.equal(expected);
+    expect(solveInput(new Input(input, true),asteroidsToShoot,[11,13])).to.equal(expected);
   });
 };
 
-describe.only('Day 10 - Second Puzzle', () => {
+describe('Day 10 - Second Puzzle', () => {
   // Top Right Sector
   testCalculateDegree([0,-1],0);
   testCalculateDegree([1,-1],45);
