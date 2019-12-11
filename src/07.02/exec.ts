@@ -1,4 +1,3 @@
-// import { IntCodeComputer } from '../05.02/exec';
 import EventEmitter from 'events';
 
 export class Amplifier {

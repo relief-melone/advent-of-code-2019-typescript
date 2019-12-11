@@ -9,6 +9,7 @@ module.exports =  {
     sourceType:  'module',  // Allows for the use of imports
   },
   rules:  {
+    'space-infix-ops': 'warn',
     'quotes': 'off',
     '@typescript-eslint/quotes' : ['warn', 'single'],
     '@typescript-eslint/indent' : ['error', 2],
