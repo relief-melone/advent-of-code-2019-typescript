@@ -17,11 +17,12 @@ describe.only('Day 9 - First Puzzle', async () => {
   
   
 
-  // it('correctly converts a layer into a grid', () => {
-  //   expect(layerToGrid([1,2,3,4,5,6],3,2)).to.deep.equal([
-  //     [1,2,3],
-  //     [4,5,6]
-  //   ]);
+  // it('will match the expected', ()=> {    
+  //   const result = solveInput([1102,34915192,34915192,7,4,7,99,0]);
+  //   expect(result.length).to.equal(16);  
   // });
+
+  
+  // test([104,1125899906842624,99],[1125899906842624]);
   
 });
