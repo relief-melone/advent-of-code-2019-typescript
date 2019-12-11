@@ -1,8 +1,6 @@
-import getLines from '../shared/getLines';
-import { getAsteroidLocations, checkHowManyInSight, sortByDegree, shootAsteroidsAndReturnLastShot } from './exec';
+import { solveInput } from './exec';
+import Input from '../shared/input';
 
-const input = getLines('input.10.01.txt').map(a => a.split(''));
-const coordinates = getAsteroidLocations(input);
+const input = new Input('input.10.01.txt');
 
-// console.log(sortByDegree([11,13],coordinates));
-console.log(shootAsteroidsAndReturnLastShot([11,13],coordinates,11));
+console.log(`Solution: ${solveInput(input, 200)}`);

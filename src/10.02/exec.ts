@@ -1,4 +1,4 @@
-import { solveInput } from '../02.01/execOpCode';
+import Input from '../shared/input';
 
 export const getConnectingVector = (
   Point1: [number, number], 
@@ -95,9 +95,12 @@ export const sortByDegree = (
   return result;
 };
 
-export const calculateDegreeAgainstVertical = (Vector: [number,number]): number => {
-  const offset = Vector[0] >= 0 ? 180 : 360;
-  return offset - Math.round(180/Math.PI * Math.acos(Vector[1]/(Math.sqrt(Math.pow(Vector[0],2)+Math.pow(Vector[1],2))))*100)/100;
+export const calculateDegreeAgainstVertical = (Vector: [number,number]): number => {  
+  return Vector[0] >= 0 
+    ? 180 - Math.round(180/Math.PI * Math.acos(Vector[1]/(Math.sqrt(Math.pow(Vector[0],2)+Math.pow(Vector[1],2))))*100)/100
+    : 360 - Math.round(180/Math.PI * Math.acos(-Vector[1]/(Math.sqrt(Math.pow(Vector[0],2)+Math.pow(Vector[1],2))))*100)/100 ;
+
+  
 };
 
 export const shootAsteroidsAndReturnLastShot = (
@@ -108,28 +111,39 @@ export const shootAsteroidsAndReturnLastShot = (
   const asteroidsSorted = sortByDegree(StationCoordinates, Locations);
   let asteroidsShot = 0;
   let index = 0;
-  const currentAstroid: AstroidSpecifications | null = null; 
+
   const shotDownAsteroids: AstroidSpecifications[] = [];
-  let currentDirection = 0;
+  let currentDirection: [number,number] = [0,-1];
   
-  while(asteroidsShot<CountToShoot){
+  whileLoop: while(asteroidsShot<CountToShoot){
     const asteroidsInThatDirection = asteroidsSorted
-      .filter(a => a.LineOfSightInDeg === currentDirection)
+      .filter(a => vectorsAreLinearDependentAndInSameDirection(a.LineOfSight, currentDirection))
       .sort((a,b) => a.Distance-b.Distance);
     
-    const nearestAsteroidInThatDirection = asteroidsInThatDirection[0];
-    
-    
+    const nearestAsteroidInThatDirection = asteroidsInThatDirection[0];    
 
     shotDownAsteroids.push(
       asteroidsSorted.splice(asteroidsSorted.findIndex(a => a.id === nearestAsteroidInThatDirection.id),1)[0]
     );
     asteroidsShot++;
-    index += asteroidsInThatDirection.length;
-    currentDirection = asteroidsSorted[index].LineOfSightInDeg;
+    if(asteroidsSorted.length === 0) break whileLoop;
+    const indexOfThatDirectionInReversedArray = [...asteroidsSorted].reverse().findIndex(a => vectorsAreLinearDependentAndInSameDirection(currentDirection, a.LineOfSight));
+    
+    index = indexOfThatDirectionInReversedArray === -1 || indexOfThatDirectionInReversedArray === 0
+      ? (index<asteroidsSorted.length ? index : 0)
+      : (asteroidsSorted.length) - indexOfThatDirectionInReversedArray;    
 
+    currentDirection = [asteroidsSorted[index].LineOfSight[0], asteroidsSorted[index].LineOfSight[1]];
   }
 
   return shotDownAsteroids;
+};
 
+export const solveInput = (input: Input, nrOfAsteroidsToShoot: number): number => {
+  
+  const characters = input.byLines().items.map(l => l.split(''));
+  const coordinates = getAsteroidLocations(characters);
+  const shotDown = shootAsteroidsAndReturnLastShot([11,13],coordinates,nrOfAsteroidsToShoot);
+  const lastShotDown = shotDown[shotDown.length-1];
+  return lastShotDown.Coordinates[0]*100+lastShotDown.Coordinates[1];
 };
