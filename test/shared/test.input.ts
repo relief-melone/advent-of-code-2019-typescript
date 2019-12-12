@@ -1,4 +1,4 @@
-import { removeDuplicates, intersect } from '../../src/shared/new/input';
+import { removeDuplicates, intersect, getPairs } from '../../src/shared/new/input';
 import { expect } from 'chai';
 
 describe('Shared', () => {
@@ -73,7 +73,13 @@ describe('Shared', () => {
         }]
       );
     });
-    
-    
+  });
+
+  describe('getPairs', () => {
+    it('will return the correct pairs from an input', () => {
+      expect(getPairs([0,1,2,3])).to.deep.equal([
+        [0,1],[0,2],[0,3],[1,2],[1,3],[2,3]
+      ]);
+    });
   });
 });
