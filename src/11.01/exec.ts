@@ -1,5 +1,5 @@
 import EventEmitter from 'events';
-import Input from '../shared/input';
+import Input, { NumberList } from '../shared/input';
 
 export class IntCodeComputer {
   program: number[];
@@ -35,6 +35,10 @@ export class IntCodeComputer {
 
   get lastOutput(): number{
     return this.output[this.output.length - 1];
+  }
+
+  spliceOutputs(nrToSplice: number): number[]{
+    return this.output.splice(0,nrToSplice);
   }
 
   addInput(number): void{
@@ -173,17 +177,17 @@ export class IntCodeComputer {
     }
   }
 
-  executeUntilOutput(): void{
-    let outputGenerated = false;
-    this.emitter.once('output', () => outputGenerated = true);
+  executeUntilOutput(numberOfOutputs = 1): void{
+    let outputsGenerated = 0;
+    this.emitter.on('output', () => outputsGenerated++);
     while(
       this.status !== 'finished' && 
-      !outputGenerated
+      outputsGenerated < numberOfOutputs
     ){
       this.loadNextInstruction();      
       this.execute();
-       
     }
+    this.emitter.removeAllListeners();
   }
 
   executeAll(): void{
@@ -194,11 +198,81 @@ export class IntCodeComputer {
   }
 }
 
-export const solveInput = (programInput: Input, initialInput = 1): number[] => {
-  const program = programInput.byCommas().toNumberList();
-  const intComputer = new IntCodeComputer(program.items);
-  intComputer.addInput(initialInput);
-  intComputer.executeAll();
-  // console.log(intComputer.output);
-  return intComputer.output;
+class TilePaintInfo {  
+  NrOfTimesPainted: number;
+  Color: 0 | 1;
+
+  constructor(){    
+    this.NrOfTimesPainted = 0;
+    this.Color = 0;
+  }
+}
+
+export class PaintRobot{
+  currentDirection: [number,number];
+  currentPosition: [number,number];
+  intComputer: IntCodeComputer;
+  
+  workInfo: Record<string, TilePaintInfo>;
+
+  constructor(program: number[]){
+    this.currentDirection = [0,1];
+    this.currentPosition = [0,0];
+    this.workInfo = {};
+    this.intComputer = new IntCodeComputer(program);
+  }
+
+  getPaintedTiles(): number{
+    return Object.keys(this.workInfo).length;
+  }
+
+  processOneStep(): void{
+    this.intComputer.executeUntilOutput(2);
+    const input = this.intComputer.spliceOutputs(2) as [0|1,0|1];
+    this.paint(input[0]); 
+    this.turnAndMove(input[1]);
+    this.intComputer.addInput(this.currentColor);
+  }
+
+  executeProgram(): void{
+    while(this.intComputer.status !== 'finished'){
+      this.processOneStep();
+    }
+  }
+
+  get currentColor(): 0|1{
+    return this.workInfo[this.posKey] ? this.workInfo[this.posKey].Color : 0;
+  }
+
+  get posKey(): string{
+    return `${this.currentPosition[0]}|${this.currentPosition[1]}`;
+  }  
+
+  paint(paintInput: 0 | 1): void {
+    if(!this.workInfo[this.posKey]) this.workInfo[this.posKey] = new TilePaintInfo();
+    const tileInfo = this.workInfo[this.posKey];
+    tileInfo.Color = paintInput;
+    tileInfo.NrOfTimesPainted++;
+  }
+
+  turnAndMove(moveOutput: 0 | 1): void{
+    const savedDirection = [...this.currentDirection];
+    if(moveOutput === 0){
+      this.currentDirection[0] = this.currentDirection[0] ? 0 : -savedDirection[1];
+      this.currentDirection[1] = this.currentDirection[1] ? 0 : savedDirection[0];
+    } else {
+      this.currentDirection[0] = this.currentDirection[0] ? 0 : savedDirection[1];
+      this.currentDirection[1] = this.currentDirection[1] ? 0 : -savedDirection[0];
+    }
+    this.currentPosition[0] += this.currentDirection[0];
+    this.currentPosition[1] += this.currentDirection[1];    
+  }
+}
+
+export const solveInput = (programInput: Input): number => {
+  const program = programInput.byCommas().toNumberList().items;  
+  const robot = new PaintRobot(program);
+  robot.executeProgram();
+  return robot.getPaintedTiles();
+  
 };
