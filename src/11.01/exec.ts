@@ -1,5 +1,5 @@
 import EventEmitter from 'events';
-import Input, { NumberList } from '../shared/input';
+import Input, { NumberList } from '../shared/new/input';
 
 export class IntCodeComputer {
   program: number[];
@@ -15,7 +15,6 @@ export class IntCodeComputer {
   status: string;
   relativeBase: number;
 
-  private phaseHasBeenSet: boolean;
 
   constructor(program: number[]){
     this.program = [...program];
@@ -24,7 +23,6 @@ export class IntCodeComputer {
     this.currentInstruction = [];
     this.currentOpCode = 0;
     this.inputQueue = [];
-    this.phaseHasBeenSet = false;
     this.parameterModes = [];
     this.output = [];
     this.iterations = 0;
@@ -273,6 +271,5 @@ export const solveInput = (programInput: Input): number => {
   const program = programInput.byCommas().toNumberList().items;  
   const robot = new PaintRobot(program);
   robot.executeProgram();
-  return robot.getPaintedTiles();
-  
+  return robot.getPaintedTiles();  
 };

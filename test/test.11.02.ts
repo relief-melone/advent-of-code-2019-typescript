@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { PaintRobot } from '../src/11.01/exec';
+import { PaintRobot } from '../src/11.02/exec';
 
 const testMoveRobot = (MoveInput,CurrentPositon, CurrentDirection, expectedPositon, expectedDirection): void => {
   it('will correctly calculate the movement', () => {
@@ -14,7 +14,7 @@ const testMoveRobot = (MoveInput,CurrentPositon, CurrentDirection, expectedPosit
 };
 
 
-describe('Day 11 - First Puzzle', () => {
+describe('Day 11 - Second Puzzle', () => {
   testMoveRobot(0,[0,0],[0,1],[-1,0],[-1,0]);
   testMoveRobot(1,[0,0],[0,1],[1,0],[1,0]);
   testMoveRobot(0,[0,0],[1,0],[0,1],[0,1]);

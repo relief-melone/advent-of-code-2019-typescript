@@ -1,4 +1,4 @@
-import { removeDuplicates, intersect } from '../../src/shared/input';
+import { removeDuplicates, intersect } from '../../src/shared/new/input';
 import { expect } from 'chai';
 
 describe('Shared', () => {

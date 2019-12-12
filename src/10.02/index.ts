@@ -1,5 +1,5 @@
 import { solveInput } from './exec';
-import Input from '../shared/input';
+import Input from '../shared/new/input';
 import { StopWatch } from '../shared/stopWatch';
 
 const sw = new StopWatch().start();

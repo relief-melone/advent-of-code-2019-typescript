@@ -1,5 +1,5 @@
 import { solveInput } from '../09.01/exec';
-import Input from '../shared/input';
+import Input from '../shared/new/input';
 
 const input = new Input('input.09.01.txt');
 

@@ -1,4 +1,4 @@
-import getRaw from './getRawInput';
+import getRaw from '../getRawInput';
 import deepEquals from 'deep-equal';
 import { isObject } from 'util';
 import { stringify } from 'querystring';
