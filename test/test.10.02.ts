@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { calculateDegreeAgainstVertical, solveInput } from '../src/10.02/exec';
-import Input from '../src/shared/input';
+import Input from '../src/shared/new/input';
 
 const testCalculateDegree = (Vector,expectedDegree): void => {
   it(`will calculate the correct Angle of [${Vector[0]},${Vector[1]}]`, () => {

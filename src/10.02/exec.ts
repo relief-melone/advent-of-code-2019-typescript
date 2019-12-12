@@ -1,10 +1,10 @@
-import Input from '../shared/input';
+import Input from '../shared/new/input';
 
 export const getConnectingVector = (
   Point1: [number, number], 
   Point2: [number, number]
 ): [number, number ] => {
-  return [Point2[0]-Point1[0],Point2[1]-Point1[1]];  
+  return [Point2[0] - Point1[0],Point2[1] - Point1[1]];  
 };
 
 export const vectorsAreLinearDependentAndInSameDirection = (
@@ -12,12 +12,12 @@ export const vectorsAreLinearDependentAndInSameDirection = (
   Vector2: [number, number]
 ): boolean => {  
   if(
-    (Vector1[0] === 0 && Vector2[0] === 0 && Vector1[1]/Vector2[1]>0) ||
-    (Vector1[1] === 0 && Vector2[1] === 0 && Vector1[0]/Vector2[0]>0)
+    (Vector1[0] === 0 && Vector2[0] === 0 && Vector1[1] / Vector2[1] > 0) ||
+    (Vector1[1] === 0 && Vector2[1] === 0 && Vector1[0] / Vector2[0] > 0)
   ) return true;
     
-  const coefficient = Vector2[0]/Vector1[0];
-  return (Vector2[1] === coefficient*Vector1[1]) && (coefficient > 0);
+  const coefficient = Vector2[0] / Vector1[0];
+  return (Vector2[1] === coefficient * Vector1[1]) && (coefficient > 0);
 };
 
 export const getLongerLinearDependentVector = (
@@ -30,7 +30,7 @@ export const getLongerLinearDependentVector = (
 export const getAsteroidLocations = (input: string[][]): [number,number][] => {
   const locations: [number,number][] = [];
   for (let y = 0; y < input.length; y++){
-    for(let x=0; x<input[y].length; x++){
+    for(let x = 0; x < input[y].length; x++){
       if(input[y][x] === '#') locations.push([x,y]);
     }
   }
@@ -86,7 +86,7 @@ export const sortByDegree = (
         Coordinates: currentLocation,
         LineOfSight: lineOfSight,
         LineOfSightInDeg: calculateDegreeAgainstVertical(lineOfSight),
-        Distance: Math.sqrt(Math.pow(lineOfSight[0],2)+Math.pow(lineOfSight[1],2)),
+        Distance: Math.sqrt(Math.pow(lineOfSight[0],2) + Math.pow(lineOfSight[1],2)),
         id: ind
       };
       return result;
@@ -97,8 +97,8 @@ export const sortByDegree = (
 
 export const calculateDegreeAgainstVertical = (Vector: [number,number]): number => {  
   return Vector[0] >= 0 
-    ? 180 - Math.round(180/Math.PI * Math.acos(Vector[1]/(Math.sqrt(Math.pow(Vector[0],2)+Math.pow(Vector[1],2))))*100)/100
-    : 360 - Math.round(180/Math.PI * Math.acos(-Vector[1]/(Math.sqrt(Math.pow(Vector[0],2)+Math.pow(Vector[1],2))))*100)/100 ;
+    ? 180 - Math.round(180 / Math.PI * Math.acos(Vector[1] / (Math.sqrt(Math.pow(Vector[0],2) + Math.pow(Vector[1],2)))) * 100) / 100
+    : 360 - Math.round(180 / Math.PI * Math.acos(-Vector[1] / (Math.sqrt(Math.pow(Vector[0],2) + Math.pow(Vector[1],2)))) * 100) / 100 ;
 
   
 };
@@ -115,10 +115,10 @@ export const shootAsteroidsAndReturnLastShot = (
   const shotDownAsteroids: AstroidSpecifications[] = [];
   let currentDirection: [number,number] = [0,-1];
   
-  whileLoop: while(asteroidsShot<CountToShoot){
+  whileLoop: while(asteroidsShot < CountToShoot){
     const asteroidsInThatDirection = asteroidsSorted
       .filter(a => vectorsAreLinearDependentAndInSameDirection(a.LineOfSight, currentDirection))
-      .sort((a,b) => a.Distance-b.Distance);
+      .sort((a,b) => a.Distance - b.Distance);
     
     const nearestAsteroidInThatDirection = asteroidsInThatDirection[0];    
 
@@ -130,7 +130,7 @@ export const shootAsteroidsAndReturnLastShot = (
     const indexOfThatDirectionInReversedArray = [...asteroidsSorted].reverse().findIndex(a => vectorsAreLinearDependentAndInSameDirection(currentDirection, a.LineOfSight));
     
     index = indexOfThatDirectionInReversedArray === -1 || indexOfThatDirectionInReversedArray === 0
-      ? (index<asteroidsSorted.length ? index : 0)
+      ? (index < asteroidsSorted.length ? index : 0)
       : (asteroidsSorted.length) - indexOfThatDirectionInReversedArray;    
 
     currentDirection = [asteroidsSorted[index].LineOfSight[0], asteroidsSorted[index].LineOfSight[1]];
@@ -144,6 +144,6 @@ export const solveInput = (input: Input, nrOfAsteroidsToShoot: number, positionO
   const characters = input.byLines().items.map(l => l.split(''));
   const coordinates = getAsteroidLocations(characters);
   const shotDown = shootAsteroidsAndReturnLastShot(positionOfStation,coordinates,nrOfAsteroidsToShoot);
-  const lastShotDown = shotDown[shotDown.length-1];
-  return lastShotDown.Coordinates[0]*100+lastShotDown.Coordinates[1];
+  const lastShotDown = shotDown[shotDown.length - 1];
+  return lastShotDown.Coordinates[0] * 100 + lastShotDown.Coordinates[1];
 };

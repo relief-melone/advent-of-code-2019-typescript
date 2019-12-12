@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { solveInput } from '../src/09.01/exec';
-import Input from '../src/shared/input';
+import Input from '../src/shared/new/input';
 
 
 const testSolveInput = (input: string, expected: number[]): void => {
