@@ -14,7 +14,7 @@ const testWithInput = (input: string, nrOfRuns: number, expectedEnergy: number):
   });
 };
 
-describe.only('Day 12 - First Puzzle', () => {
+describe('Day 12 - First Puzzle', () => {
   testLineToThreeDCoord('<x=-10, y=0, z=20>', {
     x: -10,
     y: 0,

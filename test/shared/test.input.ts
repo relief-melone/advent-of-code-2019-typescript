@@ -1,4 +1,4 @@
-import { removeDuplicates, intersect, getPairs } from '../../src/shared/new/input';
+import { removeDuplicates, intersect, getPairs, getLeastCommonMultipleFor2Values, getLeastCommonMultiple } from '../../src/shared/new/input';
 import { expect } from 'chai';
 
 describe('Shared', () => {
@@ -80,6 +80,22 @@ describe('Shared', () => {
       expect(getPairs([0,1,2,3])).to.deep.equal([
         [0,1],[0,2],[0,3],[1,2],[1,3],[2,3]
       ]);
+    });
+  });
+
+  describe('getLeastCommonMultipleForTwoValues', () => {
+    it('will return the correct common multiple for two values', () => {
+      expect(getLeastCommonMultipleFor2Values(2,3)).to.equal(6);
+      expect(getLeastCommonMultipleFor2Values(15,3)).to.equal(15);
+      expect(getLeastCommonMultipleFor2Values(25,15)).to.equal(75);
+    });
+  });
+
+  describe('getLeastCommonMultiple', () => {
+    it('will return the correct common multiple for multipl values', () => {
+      expect(getLeastCommonMultiple([2,3,15])).to.equal(30);
+      expect(getLeastCommonMultiple([8,3,15])).to.equal(120);
+
     });
   });
 });

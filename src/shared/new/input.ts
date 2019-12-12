@@ -52,7 +52,26 @@ export class NumberList {
   intersect(list: number[]): NumberList{ this.items = intersect(this.items, list); return this;}
   getChunks(chunkSize: number): number[][]{return getChunks(this.items,chunkSize);}
   getPairs(): number[][]{return getPairs(this.items);}
+  getSmallestCommonMultiple(): number{return getLeastCommonMultiple(this.items);}
 }
+
+export const getLeastCommonMultiple = (input: number[]): number => {  
+  return getPairs(input)
+    .map(pair => getLeastCommonMultipleFor2Values(pair[0],pair[1]))
+    .sort((a,b) => b - a)[0];
+  
+};
+
+export const getLeastCommonMultipleFor2Values = (val1: number, val2: number): number => {
+  let bigger = val1 > val2 ? val1 : val2;
+  let smaller = val1 > val2 ? val2 : val1;
+  while(bigger % smaller){
+    const residue = bigger % smaller;    
+    bigger = smaller;
+    smaller = residue;   
+  }
+  return val1 * val2 / smaller;
+};
 
 export const intersect = <T>(input1: T[], input2: T[]): T[] => {
   const intersection: T[] = [];
