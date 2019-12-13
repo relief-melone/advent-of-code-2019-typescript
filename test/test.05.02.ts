@@ -59,7 +59,7 @@ describe('Day 5 - Second Puzzle', () => {
     expect(intComputer.output).to.not.deep.equal([0]);
   });
 
-  it.skip('Will correctly output 999 for less than', () => {
+  it('Will correctly output 999 for less than', () => {
     const intComputer = solveInput([
       3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,
       1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,
