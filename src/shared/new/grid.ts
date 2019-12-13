@@ -151,6 +151,7 @@ export class Coordinates {
     transposed?: boolean;
     reversed?: boolean;
     silent?: boolean;
+    clearBeforePrint? : boolean;
   }): string[]{
 
     if(!options.stringMap) throw 'Please provide a string map';
@@ -160,6 +161,7 @@ export class Coordinates {
     const emptyString = stringMap.empty || ' ';
     const reversed = options.reversed !== undefined ? options.reversed : false;
     const silent = options.silent !== undefined ? options.silent : false;
+    const clearBeforePrint = options.clearBeforePrint !== undefined ? options.clearBeforePrint : false;
 
     const grid = this.getGrid(transposed);
     const p1 = transposed ? 'y' : 'x';
@@ -174,9 +176,11 @@ export class Coordinates {
       lines.push(line);      
     }
 
-    if(!silent)
+    if(!silent){
+      if(clearBeforePrint) console.clear();
       if(!reversed) lines.forEach(l => console.log(l));
       else [...lines].reverse().forEach(l => console.log(l));
+    }    
     
     return lines;
   }

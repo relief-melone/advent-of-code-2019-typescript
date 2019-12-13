@@ -29,6 +29,17 @@ export default class IntCodeComputer {
     this.status = 'running';
     this.relativeBase = 0;
   }
+  
+  resetProgram(): void{
+    this.currentIndex = 0;
+    this.nextIndex = 0;
+    this.currentInstruction = [];
+    this.currentOpCode = 0;
+    this.parameterModes = [];
+    this.output = [];
+    this.iterations = 0;
+    this.status = 'running';
+  }
 
   get lastOutput(): number{
     return this.output[this.output.length - 1];

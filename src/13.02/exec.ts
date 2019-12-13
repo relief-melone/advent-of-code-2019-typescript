@@ -8,6 +8,9 @@ const keyInputMaps = {
   left: -1,
   right: 1
 };
+
+const allowedKeys = Object.keys(keyInputMaps);
+
 const keyStringMap = {
   0: ' ',
   1: '|',
@@ -21,19 +24,19 @@ export const getProgramFromInputData = (FilenameOrRawData: string, isRawData = f
   return rawInput.byCommas().toNumberList();
 };
 
-export const runStep = (program: NumberList, input: number, printEveryOutput = false): {
+export const runStep = async (arcade: IntCodeComputer, printEveryOutput = false, timePerStep: number): Promise<{
   arcade: IntCodeComputer; 
   coords: Coordinates;
   score: number;
-} => {
-  console.clear();
-  const arcade = new IntCodeComputer(program.items);
+}> => {
+  
+  
   const coords = new Coordinates();
   let score = 0;
   let ballCoord: Coordinate = new Coordinate();
   let paddleCoord: Coordinate = new Coordinate();
-  arcade.addInput(input);
   while(arcade.status !== 'finished'){
+    
     arcade.executeUntilOutput(3);
     const output = arcade.spliceOutputs(3);
     const x = output[0];
@@ -46,19 +49,37 @@ export const runStep = (program: NumberList, input: number, printEveryOutput = f
       tileId = output[2];
       coords.add(x,y,tileId);
 
-      if(tileId === 4) ballCoord = new Coordinate(x,y,true);
-      if(tileId === 3) paddleCoord = new Coordinate(x,y,true);
-    }  
-  }
-  coords.printMappedGrid({
-    stringMap: keyStringMap,
-    transposed: true
-  });
-  console.log(`Score: ${score} 
+      if(tileId === 4){
+        await processKeyInputs(arcade, timePerStep);
+        ballCoord = new Coordinate(x,y,true);
+      
+        coords.printMappedGrid({
+          stringMap: keyStringMap,
+          transposed: true,
+          clearBeforePrint: true
+        });
+        console.log(`Score: ${score} 
 Blocks Left:        (${coords.countValues(2)})
 Ball Coordinates:   (${ballCoord.x},${ballCoord.y})
 Paddle Coordinates: (${paddleCoord.x},${paddleCoord.y})
 `); 
+      } 
+      if(tileId === 3) paddleCoord = new Coordinate(x,y,true);
+    }  
+  }
+  if(!printEveryOutput){
+    coords.printMappedGrid({
+      stringMap: keyStringMap,
+      transposed: true,
+      clearBeforePrint: true
+    });
+    console.log(`Score: ${score} 
+Blocks Left:        (${coords.countValues(2)})
+Ball Coordinates:   (${ballCoord.x},${ballCoord.y})
+Paddle Coordinates: (${paddleCoord.x},${paddleCoord.y})
+`); 
+  }
+
   return { 
     arcade,
     coords,
@@ -66,15 +87,18 @@ Paddle Coordinates: (${paddleCoord.x},${paddleCoord.y})
   };
 };
 
-export const runProgramAndReturnBlockTileCount = async (program: NumberList): Promise<number> => {
-  program.items[0] = 2;     
+export const runProgramAndReturnBlockTileCount = async (program: NumberList, timePerStep = 50): Promise<number> => {
   const stdin: any = process.stdin;
   keypress(stdin);
   stdin.setRawMode(true);
   stdin.resume();
 
+  program.items[0] = 2;     
+  const arcade = new IntCodeComputer(program.items);  
+  
   let blocksLeft = Infinity;
   let _score = 0;
+  let timesRun = 0;
   
   console.log(`
   ${'-'.repeat(10)}CONTROLS${'-'.repeat(10)}
@@ -85,26 +109,52 @@ export const runProgramAndReturnBlockTileCount = async (program: NumberList): Pr
 
   Press any key to start...
 `);
-  while(blocksLeft !== 0){
-    const key = await waitForKeyPress(stdin);
-    const input = keyInputMaps[key];
-    const { arcade, coords, score } = runStep(program, input);    
+  while(blocksLeft !== 0){    
+    const { coords, score } = await runStep(arcade, timesRun !== 0, timePerStep);    
     _score = score;
-    program = new NumberList(arcade.program);     
+    arcade.resetProgram();
+    // console.log('You missed! Try again? Push any key...');
+    // await awaitSpace(stdin);
     blocksLeft = coords.countValues(2);
+    timesRun++;
   }
   return _score;  
 };
 
-export const waitForKeyPress = (stdin: any): Promise<any> => {
-  return new Promise( (resolve) => {
+export const processKeyInputs = (arcade: IntCodeComputer, TimePerStep = 50): Promise<void> => {  
+
+  return new Promise((resolve) => {
+    const P1 = new Promise(resolve => {
+      process.stdin.once('keypress', function (ch, key) {
+        if(key.name === 'escape') process.exit();
+        if(allowedKeys.indexOf(key.name)){
+          resolve(keyInputMaps[key.name]);       
+        }    
+      });
+    });
+
+    const P2 = new Promise(resolve => {
+      setTimeout(() => {
+        process.stdin.removeAllListeners('keypress');
+        resolve(0);
+      }, TimePerStep);
+    });
     
-    
-    
-    // listen for the "keypress" event
-    stdin.once('keypress', function (ch, key) {
-      if(key.name === 'escape') process.exit();
-      resolve(key.name);
+    Promise.race([P1,P2]).then(result => {
+      arcade.addInput(result);
+      resolve();
     });
   });
+  
+  
 };
+
+// export const awaitSpace = async (stdin: any): Promise<any> => {
+//   return new Promise( (resolve) => {
+//     stdin.once('keypress', function (ch, key) {
+//       if(key.name === 'escape') process.exit();
+//       if(key.name === 'space') resolve(true);
+//       else return awaitSpace(stdin);
+//     });
+//   });
+// };
