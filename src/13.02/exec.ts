@@ -13,10 +13,10 @@ const allowedKeys = Object.keys(keyInputMaps);
 
 const keyStringMap = {
   0: ' ',
-  1: '|',
+  1: '\u258D',
   2: '\u2588',
-  3: '-',
-  4: 'B'
+  3: '\u2580',
+  4: '\u26BD'
 };
 
 export const getProgramFromInputData = (FilenameOrRawData: string, isRawData = false): NumberList =>{
@@ -28,15 +28,12 @@ export const runStep = async (arcade: IntCodeComputer, printEveryOutput = false,
   arcade: IntCodeComputer; 
   coords: Coordinates;
   score: number;
-}> => {
-  
-  
+}> => {  
   const coords = new Coordinates();
   let score = 0;
   let ballCoord: Coordinate = new Coordinate();
   let paddleCoord: Coordinate = new Coordinate();
-  while(arcade.status !== 'finished'){
-    
+  while(arcade.status !== 'finished'){    
     arcade.executeUntilOutput(3);
     const output = arcade.spliceOutputs(3);
     const x = output[0];
@@ -47,37 +44,33 @@ export const runStep = async (arcade: IntCodeComputer, printEveryOutput = false,
     } 
     else {
       tileId = output[2];
-      coords.add(x,y,tileId);
+      const coord = coords.add(x,y,tileId);
+      coords.printCoordinateMapped({
+        stringMap: keyStringMap,        
+      }, coord);
 
       if(tileId === 4){
         await processKeyInputs(arcade, timePerStep);
         ballCoord = new Coordinate(x,y,true);
       
-        coords.printMappedGrid({
+        coords.printGrid({
           stringMap: keyStringMap,
-          transposed: true,
-          clearBeforePrint: true
         });
-        console.log(`Score: ${score} 
-Blocks Left:        (${coords.countValues(2)})
-Ball Coordinates:   (${ballCoord.x},${ballCoord.y})
-Paddle Coordinates: (${paddleCoord.x},${paddleCoord.y})
-`); 
       } 
       if(tileId === 3) paddleCoord = new Coordinate(x,y,true);
     }  
   }
   if(!printEveryOutput){
-    coords.printMappedGrid({
+    coords.printGrid({
       stringMap: keyStringMap,
-      transposed: true,
-      clearBeforePrint: true
+      clearConsoleFirst: true,
+      additionalText: `
+      Score: ${score} 
+      Blocks Left:        (${coords.countValues(2)})
+      Ball Coordinates:   (${ballCoord.x},${ballCoord.y})
+      Paddle Coordinates: (${paddleCoord.x},${paddleCoord.y})
+      `
     });
-    console.log(`Score: ${score} 
-Blocks Left:        (${coords.countValues(2)})
-Ball Coordinates:   (${ballCoord.x},${ballCoord.y})
-Paddle Coordinates: (${paddleCoord.x},${paddleCoord.y})
-`); 
   }
 
   return { 
@@ -88,6 +81,7 @@ Paddle Coordinates: (${paddleCoord.x},${paddleCoord.y})
 };
 
 export const runProgramAndReturnBlockTileCount = async (program: NumberList, timePerStep = 50): Promise<number> => {
+  console.clear();
   const stdin: any = process.stdin;
   keypress(stdin);
   stdin.setRawMode(true);
@@ -126,7 +120,10 @@ export const processKeyInputs = (arcade: IntCodeComputer, TimePerStep = 50): Pro
   return new Promise((resolve) => {
     const P1 = new Promise(resolve => {
       process.stdin.once('keypress', function (ch, key) {
-        if(key.name === 'escape') process.exit();
+        if(key.name === 'escape'){
+          console.clear();
+          process.exit();
+        } 
         if(allowedKeys.indexOf(key.name)){
           resolve(keyInputMaps[key.name]);       
         }    
@@ -145,16 +142,4 @@ export const processKeyInputs = (arcade: IntCodeComputer, TimePerStep = 50): Pro
       resolve();
     });
   });
-  
-  
 };
-
-// export const awaitSpace = async (stdin: any): Promise<any> => {
-//   return new Promise( (resolve) => {
-//     stdin.once('keypress', function (ch, key) {
-//       if(key.name === 'escape') process.exit();
-//       if(key.name === 'space') resolve(true);
-//       else return awaitSpace(stdin);
-//     });
-//   });
-// };

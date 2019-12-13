@@ -13,6 +13,7 @@
   "license": "MIT",
   "dependencies": {
     "@types/node": "^10.12.2",
+    "ansi": "^0.3.1",
     "clone-deep": "^4.0.1",
     "deep-equal": "^1.1.1",
     "keypress": "^0.2.1",
@@ -20,6 +21,7 @@
     "typescript": "^3.7.2"
   },
   "devDependencies": {
+    "@types/ansi": "^0.3.2",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.5",
     "@typescript-eslint/eslint-plugin": "^2.10.0",

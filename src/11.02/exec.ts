@@ -297,10 +297,11 @@ export const solveInput = (programInput: Input): any => {
   const robot = new PaintRobot(program, 1);
   robot.executeProgram();
   
-  robot.currentCoordinates.printBoolGrid({ 
-    transposed: true,
-    reversed: true,
-    trueString: '\u2B1C'
-    
+  robot.currentCoordinates.reverse().printGrid({ 
+    clearConsoleFirst: true,
+    stringMap: {
+      0: ' ',
+      1: '\u2588'
+    }
   });
 };
