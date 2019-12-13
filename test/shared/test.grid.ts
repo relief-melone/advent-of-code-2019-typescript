@@ -90,8 +90,132 @@ describe('Coordinates', () => {
       [3,6,null,null],
       [null,null,null,9]
     ]);
-  
   });
+
+  it('will correctly add a new value that does not exist', () => {
+    const coords = new Coordinates([
+      new Coordinate(1,0,3),
+      new Coordinate(1,1,6),
+      new Coordinate(2,3,9)
+    ]);
+
+    coords.add(1,3,5);
+
+    expect(coords.values).to.deep.equal([
+      new Coordinate(1,0,3),
+      new Coordinate(1,1,6),
+      new Coordinate(2,3,9),
+      new Coordinate(1,3,5)
+    ]);
+  });
+
+  it('will correctly overwrite a value for existing coorinates', () => {
+    const coords = new Coordinates([
+      new Coordinate(1,0,3),
+      new Coordinate(1,1,6),
+      new Coordinate(2,3,9)
+    ]);
+
+    coords.add(1,1,8);
+
+    expect(coords.values).to.deep.equal([
+      new Coordinate(1,0,3),
+      new Coordinate(1,1,8),
+      new Coordinate(2,3,9)
+    ]);
+  });
+
+  it('will correctly remove an existing coordinate and return true', () => {
+    const coords = new Coordinates([
+      new Coordinate(1,0,3),
+      new Coordinate(1,1,6),
+      new Coordinate(2,3,9)
+    ]);
+
+    const removed = coords.remove(1,1);
+
+    expect(removed).to.be.true;
+    expect(coords.values).to.deep.equal([
+      new Coordinate(1,0,3),      
+      new Coordinate(2,3,9)
+    ]);
+  });
+
+  it('will correctly look for a non existing coordinate and return false', () => {
+    const coords = new Coordinates([
+      new Coordinate(1,0,3),
+      new Coordinate(1,1,6),
+      new Coordinate(2,3,9)
+    ]);
+
+    const removed = coords.remove(2,2);
+
+    expect(removed).to.be.false;
+    expect(coords.values).to.deep.equal([
+      new Coordinate(1,0,3),
+      new Coordinate(1,1,6),      
+      new Coordinate(2,3,9)
+    ]);
+  });
+
+  it('will correctly getACoordinate by its x and y Values', () =>{
+    const coords = new Coordinates([
+      new Coordinate(1,0,3),
+      new Coordinate(1,1,6),
+      new Coordinate(2,3,9)
+    ]);
+
+    const found = coords.getByXAndY(2,3);
+
+    expect(found).to.deep.equal(    
+      new Coordinate(2,3,9)
+    );
+  });
+
+  it('will correctly search for a coordinate by its x and y values and return null for not found', () =>{
+    const coords = new Coordinates([
+      new Coordinate(1,0,3),
+      new Coordinate(1,1,6),
+      new Coordinate(2,3,9)
+    ]);
+
+    const found = coords.getByXAndY(3,3);
+
+    expect(found).to.equal(null);
+  });
+
+  it('will correctly count primitive values', () => {
+    const coords = new Coordinates([
+      new Coordinate(1,0,3),
+      new Coordinate(1,1,6),
+      new Coordinate(2,3,9),
+      new Coordinate(3,3,9)
+    ]);
+
+    expect(coords.countValues(9)).to.equal(2);
+  });
+
+  
+  it('will correctly count non-primitive values', () => {
+    const coords = new Coordinates([
+      new Coordinate(1,0,{ a:15,
+        b: 3 }),
+      new Coordinate(1,1,{ a:15,
+        c: 3 }),
+      new Coordinate(2,3,{ a:12,
+        b: 3 }),
+      new Coordinate(3,3,{ a:15,
+        b: 3 }),
+      new Coordinate(3,3,{ a:15,
+        b: 3 })
+    ]);
+
+    expect(coords.countValues({ 
+      a: 15,
+      b: 3 
+    })).to.equal(3);
+  });
+  
 
   it('will return a correct grid with 0 as replacement for undefined values', () => {
     const coords = new Coordinates([
@@ -157,6 +281,29 @@ describe('Coordinates', () => {
         ' x'
       ]);
   
-    });
+    });    
+  });
+  it('will print a corrected mapped grid', () => {
+    const coords = new Coordinates([
+      new Coordinate(1,0,3),
+      new Coordinate(1,1,6),
+      new Coordinate(2,3,9)
+    ]);
+
+    expect(coords.printMappedGrid({ 
+      transposed: true,
+      stringMap: {
+        3: 'x',
+        6: '-',
+        9: '9',
+        empty: ' '
+      },
+      silent: true
+    })).to.deep.equal([
+      'x ',
+      '- ',
+      '  ',
+      ' 9'
+    ]);
   });
 });

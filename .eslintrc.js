@@ -9,7 +9,7 @@ module.exports =  {
     sourceType:  'module',  // Allows for the use of imports
   },
   rules:  {
-    'object-property-newline': ['off', { 'allowAllPropertiesOnSameLine': 'off' }],
+    'object-property-newline': 'off',
     'space-infix-ops': 'warn',
     'quotes': 'off',
     '@typescript-eslint/quotes' : ['warn', 'single'],

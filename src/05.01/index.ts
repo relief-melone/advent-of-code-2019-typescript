@@ -1,8 +1,8 @@
-import getCommaSeparatedList from "../shared/getCommaSeparatedList";
-import { solveInput } from "./exec";
+import getCommaSeparatedList from '../shared/getCommaSeparatedList';
+import { solveInput } from './exec';
 
-const input = getCommaSeparatedList("input.05.01.txt").map(a=> parseInt(a));
+const input = getCommaSeparatedList('input.05.01.txt').map(a=> parseInt(a));
 
-const intComputer = solveInput(input,1);
+const intCodeComp = solveInput(input,1);
 
-console.log(intComputer.output)
+console.log(intCodeComp.lastOutput);
