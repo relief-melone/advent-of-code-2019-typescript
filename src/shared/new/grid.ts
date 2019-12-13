@@ -1,5 +1,8 @@
 import deepEqual from 'deep-equal';
 import { isPrimitive } from 'util';
+import ansi from 'ansi';
+
+const cursor = ansi(process.stdout);
 
 export class Coordinate {
   coordAndVal: [number, number, any];
@@ -67,10 +70,12 @@ export class Coordinates {
     };
   }
 
-  add(x,y,val: any): void{
+  add(x,y,val: any): Coordinate{
     const ind = this.values.findIndex(c => c.x === x && c.y === y);
-    if(ind !== -1) this.values[ind] = new Coordinate(x,y,val);
-    else this.values.push(new Coordinate(x,y,val));
+    const coord = new Coordinate(x,y,val);
+    if(ind !== -1) this.values[ind] = coord;
+    else this.values.push(coord);
+    return coord;
   }
 
   remove(x,y): boolean{
@@ -113,75 +118,98 @@ export class Coordinates {
     return grid;
   }
 
-  printBoolGrid(options: {
-    trueString?: string;
-    falseString?: string;
-    transposed?: boolean;
-    reversed?: boolean;
-    silent?: boolean;
-  }): string[]{
-    const transposed = options.transposed !== undefined ? options.transposed : false;
-    const trueString = options.trueString !== undefined ? options.trueString : '\u25A1';
-    const falseString = options.falseString !== undefined ? options.falseString : ' ';
-    const reversed = options.reversed !== undefined ? options.reversed : false;
-    const silent = options.silent !== undefined ? options.silent : false;
-
-    const grid = this.getGrid(transposed);
-    const p1 = transposed ? 'y' : 'x';
-    const p2 = transposed ? 'x' : 'y';
-    
-    const lines: string[] = [];
-    for(let _p1 = 0; _p1 < this.width[p1]; _p1++){
-      let line = '';
-      for(let _p2 = 0; _p2 < this.width[p2]; _p2++){
-        line += grid[_p1][_p2] ? trueString : falseString;
-      }
-      lines.push(line);      
-    }
-
-    if(!silent)
-      if(!reversed) lines.forEach(l => console.log(l));
-      else [...lines].reverse().forEach(l => console.log(l));
-    
-    return lines;
+  transpose(): Coordinates{
+    return new Coordinates(
+      this.values.map(coord => {
+        return new Coordinate(coord.y, coord.x, coord.val);
+      })
+    );
   }
 
-  printMappedGrid(options: {
+  reverse(): Coordinates{
+    return new Coordinates(
+      this.values.map(coord => {
+        return new Coordinate(coord.x,-coord.y, coord.val);
+      })
+    );
+  }
+
+  printGrid(options: {
     stringMap: Record<string,string>;
-    transposed?: boolean;
-    reversed?: boolean;
-    silent?: boolean;
-    clearBeforePrint? : boolean;
-  }): string[]{
-
+    clearConsoleFirst?: boolean;
+    defaultOffset?: {
+      x: number;
+      y: number;
+    };
+    additionalText?: string;
+  }): void{
     if(!options.stringMap) throw 'Please provide a string map';
+    const clearConsoleFirst = options.clearConsoleFirst !== undefined ? options.clearConsoleFirst : false;
+    const defaultOffset = options.defaultOffset !== undefined ? options.defaultOffset : { 
+      x: 2,
+      y: 2 
+    };
+    const additionalText = options.additionalText !== undefined ? options.additionalText : '';
 
-    const transposed = options.transposed !== undefined ? options.transposed : false;
     const stringMap = options.stringMap;
-    const emptyString = stringMap.empty || ' ';
-    const reversed = options.reversed !== undefined ? options.reversed : false;
-    const silent = options.silent !== undefined ? options.silent : false;
-    const clearBeforePrint = options.clearBeforePrint !== undefined ? options.clearBeforePrint : false;
+    const emptyString = stringMap.empty || '';            
 
-    const grid = this.getGrid(transposed);
-    const p1 = transposed ? 'y' : 'x';
-    const p2 = transposed ? 'x' : 'y';
+    const xOff = this.gridOffset.x + defaultOffset.x;
+    const yOff = this.gridOffset.y + defaultOffset.y;
     
-    const lines: string[] = [];
-    for(let _p1 = 0; _p1 < this.width[p1]; _p1++){
-      let line = '';
-      for(let _p2 = 0; _p2 < this.width[p2]; _p2++){
-        line += stringMap[grid[_p1][_p2]] || emptyString;
-      }
-      lines.push(line);      
+    let endOfCommand = this.width.y;
+
+    if(clearConsoleFirst) console.clear();
+    this.values.map(coord => {
+      const x = coord.x + xOff;
+      const y = coord.y + yOff;
+
+      if(coord.val){
+        cursor
+          .goto(x,y)
+          .write(coord.val ? stringMap[coord.val] : emptyString);
+      }      
+    });
+
+    if(additionalText){
+      cursor
+        .goto(1,endOfCommand + 5)
+        .write(additionalText);
+      endOfCommand += additionalText.split('\n').length;
     }
 
-    if(!silent){
-      if(clearBeforePrint) console.clear();
-      if(!reversed) lines.forEach(l => console.log(l));
-      else [...lines].reverse().forEach(l => console.log(l));
-    }    
+    cursor.goto(0,endOfCommand + 5);
+  }
+
+  printCoordinateMapped(
+    options: {
+      stringMap: Record<string,string>;
+      defaultOffset?: {
+        x: number;
+        y: number;
+      };
+    },
+    coord: Coordinate
+  ): void{
+    if(!options.stringMap) throw 'Please provide a string map';
+    const defaultOffset = options.defaultOffset !== undefined ? options.defaultOffset : { 
+      x: 2,
+      y: 2 
+    };
     
-    return lines;
+    const stringMap = options.stringMap;
+    const emptyString = stringMap.empty || ' ';            
+
+    const xOff = this.gridOffset.x + defaultOffset.x;
+    const yOff = this.gridOffset.y + defaultOffset.y;
+
+    const x = coord.x + xOff;
+    const y = coord.y + yOff;
+
+    cursor
+      .goto(x,y)
+      .write(coord.val ? stringMap[coord.val] : emptyString);
+
+    cursor.reset;
   }
 }
