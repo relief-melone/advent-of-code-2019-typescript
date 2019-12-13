@@ -11,9 +11,9 @@ const keyInputMaps = {
 const keyStringMap = {
   0: ' ',
   1: '|',
-  2: '#',
+  2: '\u2588',
   3: '-',
-  4: 'O'
+  4: 'B'
 };
 
 export const getProgramFromInputData = (FilenameOrRawData: string, isRawData = false): NumberList =>{
@@ -21,7 +21,7 @@ export const getProgramFromInputData = (FilenameOrRawData: string, isRawData = f
   return rawInput.byCommas().toNumberList();
 };
 
-export const runStep = (program: NumberList, input: number): {
+export const runStep = (program: NumberList, input: number, printEveryOutput = false): {
   arcade: IntCodeComputer; 
   coords: Coordinates;
   score: number;
@@ -30,7 +30,8 @@ export const runStep = (program: NumberList, input: number): {
   const arcade = new IntCodeComputer(program.items);
   const coords = new Coordinates();
   let score = 0;
-  let ballCoordinates: Coordinate = new Coordinate(0,0);
+  let ballCoord: Coordinate = new Coordinate();
+  let paddleCoord: Coordinate = new Coordinate();
   arcade.addInput(input);
   while(arcade.status !== 'finished'){
     arcade.executeUntilOutput(3);
@@ -45,7 +46,8 @@ export const runStep = (program: NumberList, input: number): {
       tileId = output[2];
       coords.add(x,y,tileId);
 
-      if(tileId === 4) ballCoordinates = new Coordinate(x,y,true);
+      if(tileId === 4) ballCoord = new Coordinate(x,y,true);
+      if(tileId === 3) paddleCoord = new Coordinate(x,y,true);
     }  
   }
   coords.printMappedGrid({
@@ -53,8 +55,9 @@ export const runStep = (program: NumberList, input: number): {
     transposed: true
   });
   console.log(`Score: ${score} 
-Blocks Left: ${coords.countValues(2)}
-Ball Coordinates: (${ballCoordinates.x},${ballCoordinates.y})
+Blocks Left:        (${coords.countValues(2)})
+Ball Coordinates:   (${ballCoord.x},${ballCoord.y})
+Paddle Coordinates: (${paddleCoord.x},${paddleCoord.y})
 `); 
   return { 
     arcade,
@@ -73,6 +76,15 @@ export const runProgramAndReturnBlockTileCount = async (program: NumberList): Pr
   let blocksLeft = Infinity;
   let _score = 0;
   
+  console.log(`
+  ${'-'.repeat(10)}CONTROLS${'-'.repeat(10)}
+  UP     - DO NOTHING
+  LEFT   - MOVE PADDLE LEFT
+  RIGHT  - MOVE PADDLE RIGHT
+  ESC    - QUIT GAME
+
+  Press any key to start...
+`);
   while(blocksLeft !== 0){
     const key = await waitForKeyPress(stdin);
     const input = keyInputMaps[key];
