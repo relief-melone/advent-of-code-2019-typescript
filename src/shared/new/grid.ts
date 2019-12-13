@@ -1,3 +1,6 @@
+import deepEqual from 'deep-equal';
+import { isPrimitive } from 'util';
+
 export class Coordinate {
   coordAndVal: [number, number, any];
   
@@ -62,6 +65,33 @@ export class Coordinates {
       x: -this.getLimitValue(this.values, 'x'),
       y: -this.getLimitValue(this.values, 'y')
     };
+  }
+
+  add(x,y,val: any): void{
+    const ind = this.values.findIndex(c => c.x === x && c.y === y);
+    if(ind !== -1) this.values[ind] = new Coordinate(x,y,val);
+    else this.values.push(new Coordinate(x,y,val));
+  }
+
+  remove(x,y): boolean{
+    const ind = this.values.findIndex(c => c.x === x && c.y === y);
+    if(ind === -1) return false;
+    else this.values.splice(ind,1);
+    return true;
+  }
+
+  getByXAndY(x,y): any{
+    return this.values.filter(coord => coord.x === x && coord.y === y)[0] || null;
+  }
+
+  countValues(val: any): number{
+    
+    const filterFunc = isPrimitive(val)
+      ? v => v.val === val
+      : v => deepEqual(v.val,val);
+
+    return this.values.filter(filterFunc).length;
+
   }
 
   getGrid(transpose = false, undefinedReplacement: any = null): any[][]{

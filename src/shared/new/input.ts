@@ -1,7 +1,5 @@
 import getRaw from '../getRawInput';
 import deepEquals from 'deep-equal';
-import { isObject } from 'util';
-import { stringify } from 'querystring';
 
 export default class Input {
   raw: string;
@@ -37,6 +35,7 @@ export class StringList {
   removeDuplicates(): StringList {removeDuplicates(this.items); return this;}
   intersect(list: string[]): StringList{ this.items = intersect(this.items, list); return this;}
   getChunks(chunkSize: number): string[][]{return getChunks(this.items,chunkSize);}
+  getPairs(): string[][]{return getPairs(this.items);}
 }
 
 export class NumberList {
@@ -49,7 +48,27 @@ export class NumberList {
   removeDuplicates(): NumberList { removeDuplicates(this.items); return this;}
   intersect(list: number[]): NumberList{ this.items = intersect(this.items, list); return this;}
   getChunks(chunkSize: number): number[][]{return getChunks(this.items,chunkSize);}
+  getPairs(): number[][]{return getPairs(this.items);}
+  getSmallestCommonMultiple(): number{return getLeastCommonMultiple(this.items);}
 }
+
+export const getLeastCommonMultiple = (input: number[]): number => {  
+  return getPairs(input)
+    .map(pair => getLeastCommonMultipleFor2Values(pair[0],pair[1]))
+    .sort((a,b) => b - a)[0];
+  
+};
+
+export const getLeastCommonMultipleFor2Values = (val1: number, val2: number): number => {
+  let bigger = val1 > val2 ? val1 : val2;
+  let smaller = val1 > val2 ? val2 : val1;
+  while(bigger % smaller){
+    const residue = bigger % smaller;    
+    bigger = smaller;
+    smaller = residue;   
+  }
+  return val1 * val2 / smaller;
+};
 
 export const intersect = <T>(input1: T[], input2: T[]): T[] => {
   const intersection: T[] = [];
@@ -66,6 +85,18 @@ export const intersect = <T>(input1: T[], input2: T[]): T[] => {
   }
 
   return intersection;
+};
+
+export const getPairs = <T>(input: T[]): [T,T][] => {
+  const pairs: [T,T][] = [];
+  for(let i = 0; i < input.length - 1;i++){
+    for(let j = 1; j < input.length; j++){
+      if(j > i){
+        pairs.push([input[i],input[j]]); 
+      }
+    }
+  }
+  return pairs;
 };
 
 export const removeDuplicates = <T>(input: T[]): T[] => {
