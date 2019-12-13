@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node ./dist/src/index.js",
     "test": "./node_modules/.bin/mocha ./dist/test",
-    "test/shared" : "./node_modules/.bin/mocha ./dist/test/shared --recursive",
+    "test/shared": "./node_modules/.bin/mocha ./dist/test/shared --recursive",
     "tsc": "./node_modules/.bin/tsc"
   },
   "author": "Relief.Melone",
@@ -15,6 +15,7 @@
     "@types/node": "^10.12.2",
     "clone-deep": "^4.0.1",
     "deep-equal": "^1.1.1",
+    "keypress": "^0.2.1",
     "module-alias": "^2.2.2",
     "typescript": "^3.7.2"
   },

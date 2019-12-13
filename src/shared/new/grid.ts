@@ -146,5 +146,38 @@ export class Coordinates {
     return lines;
   }
 
+  printMappedGrid(options: {
+    stringMap: Record<string,string>;
+    transposed?: boolean;
+    reversed?: boolean;
+    silent?: boolean;
+  }): string[]{
 
+    if(!options.stringMap) throw 'Please provide a string map';
+
+    const transposed = options.transposed !== undefined ? options.transposed : false;
+    const stringMap = options.stringMap;
+    const emptyString = stringMap.empty || ' ';
+    const reversed = options.reversed !== undefined ? options.reversed : false;
+    const silent = options.silent !== undefined ? options.silent : false;
+
+    const grid = this.getGrid(transposed);
+    const p1 = transposed ? 'y' : 'x';
+    const p2 = transposed ? 'x' : 'y';
+    
+    const lines: string[] = [];
+    for(let _p1 = 0; _p1 < this.width[p1]; _p1++){
+      let line = '';
+      for(let _p2 = 0; _p2 < this.width[p2]; _p2++){
+        line += stringMap[grid[_p1][_p2]] || emptyString;
+      }
+      lines.push(line);      
+    }
+
+    if(!silent)
+      if(!reversed) lines.forEach(l => console.log(l));
+      else [...lines].reverse().forEach(l => console.log(l));
+    
+    return lines;
+  }
 }

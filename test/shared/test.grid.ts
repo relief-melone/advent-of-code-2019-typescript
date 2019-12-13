@@ -281,6 +281,29 @@ describe('Coordinates', () => {
         ' x'
       ]);
   
-    });
+    });    
+  });
+  it('will print a corrected mapped grid', () => {
+    const coords = new Coordinates([
+      new Coordinate(1,0,3),
+      new Coordinate(1,1,6),
+      new Coordinate(2,3,9)
+    ]);
+
+    expect(coords.printMappedGrid({ 
+      transposed: true,
+      stringMap: {
+        3: 'x',
+        6: '-',
+        9: '9',
+        empty: ' '
+      },
+      silent: true
+    })).to.deep.equal([
+      'x ',
+      '- ',
+      '  ',
+      ' 9'
+    ]);
   });
 });
